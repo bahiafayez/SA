@@ -1,1 +1,167 @@
-Charts
+<STYLE type="text/css">
+   label {display:inline}
+   input {display: inline}
+ </STYLE>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(drawChart);
+
+      // Callback that creates and populates a data table, 
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+        // Create the data table.
+        // var data = new google.visualization.DataTable();
+        // data.addColumn('string', 'Topping');
+        // data.addColumn('number', 'Slices');
+        // data.addRows([
+          // ['Mushrooms', 3],
+          // ['Onions', 1],
+          // ['Olives', 1], 
+          // ['Zucchini', 1],
+          // ['Pepperoni', 2]
+        // ]);
+
+        // Set chart options
+       
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Sales', 'Expenses'],
+          ['2004',  1000,      400],
+          ['2005',  1170,      460],
+          ['2006',  660,       1120],
+          ['2007',  1030,      540]
+        ]);
+
+        var options = {
+          title: 'All Articles', 'width':500, 'height':400, 'legend.position':'bottom'
+        };
+
+      
+ 
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+        // function selectHandler() {
+          // var selectedItem = chart.getSelection()[0];
+          // if (selectedItem) {
+            // var topping = data.getValue(selectedItem.row, 0);
+            // alert('The user selected ' + topping);
+          // }
+        // }
+
+	
+	 function selectHandler() {
+          var selection = chart.getSelection();
+          var message =""
+          
+          for (var i = 0; i < selection.length; i++) {
+		    var item = selection[i];
+		    if (item.row != null && item.column != null) {
+		      message += data.getColumnLabel(item.column) + ' : ' + data.getValue(item.row, item.column) + ',date: ' + data.getValue(item.row, 0);  
+		    } else if (item.row != null) {
+		      message += '{row:' + item.row + '}';
+		    } else if (item.column != null) {
+		      message += data.getColumnLabel(item.column);
+		    }
+		  }
+		  if (message == '') {
+		    message = 'nothing';
+		  }
+		  alert('You selected ' + message);
+		          
+        }
+	 
+
+
+        google.visualization.events.addListener(chart, 'select', selectHandler);    
+        chart.draw(data, options);
+      }
+
+
+	 $(document).ready(function() {
+  return $("#semester_sel2").change(changeSemester2).trigger("change");
+});
+
+    
+changeSemester2 = function() {
+  var url;
+  url = void 0;
+  url = "/applicants/get_semester?sem=" + $(this).val();
+  return $.getJSON(url, function(data) {
+    console.log(data);
+    accept=data['approved']
+    reject=data['rejected']
+    submit=data['submitted']
+    save=data['saved']
+    close=data['closed']
+    drawChart()
+    //$('#all_apps').html(data['all']);
+    //$('#saved_apps').html(data['saved']);
+    //$('#submitted_apps').html(data['submitted']);
+    //$('#approved_apps').html(data['approved']);
+    //$('#rejected_apps').html(data['rejected']);
+    //return $('#closed_apps').html(data['closed']);
+  });
+};
+
+
+    </script>
+
+<!-- <div id="chart_div" style="width:400; height:300"></div> -->
+
+<div class="span6">
+
+			<div id="dashboard" style="width: 600px; position: relative; float:right;"></div>
+			<div id="data_chooser">
+				<center>
+				<b>المؤشر:</b><br />
+				<input id="stat[قرائة أخبار كل مرشح]" type="radio" onclick="updateStats()" value="view_count" name="stat">
+				<label for="stat[قرائة أخبار كل مرشح]">قرائة أخبار كل مرشح</label>
+				<input id="stat[عدد أخبار كل مرشح]" type="radio" checked="yes" onclick="updateStats()" value="article_count" name="stat">
+				<label for="stat[عدد أخبار كل مرشح]">عدد أخبار كل مرشح</label>
+				<input id="stat[الشبكات الإجتماعية]" type="radio" onclick="updateStats()" value="fb_count" name="stat">
+				<label for="stat[الشبكات الإجتماعية]">الشبكات الإجتماعية</label>
+				</center>
+			</div>
+			<div id="chart_div" style="width: 500px; height: 400px;"></div>
+			<center><div id="candidate_chooser" class="span5">
+				<input id="candidates[أبو اسماعيل]" type="checkbox" onclick="updateControlCandidates()" value="أبو اسماعيل" name="candidates">
+					<label for="candidates[أبو اسماعيل]">أبو اسماعيل</label>
+					<input id="candidates[خيرت الشاطر]" type="checkbox" checked="checked" onclick="updateControlCandidates()" value="خيرت الشاطر" name="candidates">
+					<label for="candidates[خيرت الشاطر]">خيرت الشاطر</label>
+					<input id="candidates[أبو الفتوح]" type="checkbox" onclick="updateControlCandidates()" value="أبو الفتوح" name="candidates">
+					<label for="candidates[أبو الفتوح]">أبو الفتوح</label>
+					<input id="candidates[عمر سليمان]" type="checkbox" onclick="updateControlCandidates()" value="عمر سليمان" name="candidates">
+					<label for="candidates[عمر سليمان]">عمر سليمان</label>
+					<input id="candidates[عمرو موسى]" type="checkbox" onclick="updateControlCandidates()" value="عمرو موسى" name="candidates">
+					<label for="candidates[عمرو موسى]">عمرو موسى</label>
+					<input id="candidates[محمد مرسي]" type="checkbox" checked="checked" onclick="updateControlCandidates()" value="محمد مرسي" name="candidates">
+					<label for="candidates[محمد مرسي]">محمد مرسي</label>
+					<input id="candidates[أحمد شفيق]" type="checkbox" onclick="updateControlCandidates()" value="أحمد شفيق" name="candidates">
+					<label for="candidates[أحمد شفيق]">أحمد شفيق</label>
+					<input id="candidates[حمدين صباحي]" type="checkbox" onclick="updateControlCandidates()" value="حمدين صباحي" name="candidates">
+					<label for="candidates[حمدين صباحي]">حمدين صباحي</label>
+			</div></center>
+			<div id="control" style="width: 600px; height: 100px; position: relative;"></div>
+</div>
+<div class="span5">	
+<div class="well sidebar-nav">
+<h3>Text</h3><br>
+                <!-- <ul class="nav nav-list">
+                  <li class="nav-header">Sidebar</li>
+                  <li><%= link_to "Link1", "/path1"  %></li>
+                  <li><%= link_to "Link2", "/path2"  %></li>
+                  <li><%= link_to "Link3", "/path3"  %></li>
+                </ul> -->
+<p> Text here </p>
+
+</div>
+</div>
+
