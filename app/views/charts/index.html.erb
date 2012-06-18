@@ -12,8 +12,12 @@
       // Set a callback to run when the Google Visualization API is loaded.
       google.setOnLoadCallback(drawChart);
 
-	 var chart, chart2,dataReceived, control, dashboard, data, data2, data_array, stat_titles, tag_colors, option, options2, view, allcolumns, hideCols;
+	 var chart, d1, d2, d3, chart2,dataReceived, control, dashboard, data, data2, data_array, stat_titles, tag_colors, option, options2, view, allcolumns, hideCols;
 	 	dataReceived=[];
+	 	d1=[];
+	 	d2=[];
+	 	d3=[];
+	 	
 	 	// dataReceived=[
         // ['2-2-234',654,234,678],
         // ['2,3,44',87,890,543],
@@ -84,10 +88,7 @@
         
         
         
-        data_array['articles'].addRows([
-        	[new Date('2012-03-15'), 111,22,234,111,33],
-        	[new Date('2012-03-16'), 11,242,34,119,3]
-        ])
+        data_array['articles'].addRows(d1)
         
         data_array['comments'] = new google.visualization.DataTable();
         data_array['comments'].addColumn('date','Date');
@@ -99,10 +100,7 @@
         
         
         
-        data_array['comments'].addRows([
-        	[new Date('2012-03-15'), 1,2,3,4,33],
-        	[new Date('2012-03-16'), 11,242,4,119,3]
-        ])
+        data_array['comments'].addRows(d2)
         
         data_array['twitter'] = new google.visualization.DataTable();
         data_array['twitter'].addColumn('date','Date');
@@ -114,10 +112,7 @@
         
         
         
-        data_array['twitter'].addRows([
-        	[new Date('2012-03-15'), 55,22,54,111,89],
-        	[new Date('2012-03-16'), 11,34,34,77,3]
-        ])
+        data_array['twitter'].addRows(d3)
         
     	data=data_array['articles']
 
@@ -149,6 +144,8 @@
 		    var item = selection[i];
 		    if (item.row != null && item.column != null) {
 		    column=allcolumns[item.column];
+		    console.debug("column iss")
+		    console.debug(column)
 		      message += data.getColumnLabel(column) + ' : ' + data.getValue(item.row, column) + ',date: ' + data.getValue(item.row, 0);  
 		    } else if (item.row != null) {
 		      message += '{row:' + item.row + '}';
@@ -286,6 +283,14 @@
 		if(columns.length==1)
 		{
 		 document.getElementById(a.id).checked=true
+		 
+		 for (var i = 0; i < candidateList.length; i++) {  // add it again to columns
+			if (candidateList[i].checked) //checkedCount++;
+				{
+					console.debug(candidateList[i].value)
+					columns.push(i+1)
+				}
+			}
 	   	 return
 		}
 		
@@ -299,9 +304,51 @@
   //return $("#semester_sel2").change(changeSemester2).trigger("change");
   //updateStats();
   updateControlCandidates2();
+  getFirstChart();
 });
 
+getFirstChart = function() {
+  var url;
+  url = void 0;
+  url = "/articles/get_mentions";
+  $.getJSON(url,{src:"articles"} ,function(data5) {
+    console.log(data5);
     
+    for(var i=0; i<data5.length; i++)
+    {
+    	console.debug(data5[i][0])
+    	data5[i][0]= new Date(data5[i][0])
+    }
+    d1=data5;
+    drawChart();
+    //chart.draw()
+      });
+  $.getJSON(url,{src:"comments"} ,function(data5) {
+    console.log(data5);
+    
+    for(var i=0; i<data5.length; i++)
+    {
+    	console.debug(data5[i][0])
+    	data5[i][0]= new Date(data5[i][0])
+    }
+    d2=data5;
+    drawChart();
+    //chart.draw()
+      });
+   $.getJSON(url,{src:"twitter"} ,function(data5) {
+    console.log(data5);
+    
+    for(var i=0; i<data5.length; i++)
+    {
+    	console.debug(data5[i][0])
+    	data5[i][0]= new Date(data5[i][0])
+    }
+    d3=data5;
+    drawChart();
+    //chart.draw()
+      });
+};
+      
 getKey = function(val, source) {
   var url;
   url = void 0;
@@ -312,18 +359,6 @@ getKey = function(val, source) {
     dataReceived=data5;
     drawChart2();
      
-    // accept=data['approved']
-    // reject=data['rejected']
-    // submit=data['submitted']
-    // save=data['saved']
-    // close=data['closed']
-    //drawChart()
-    //$('#all_apps').html(data['all']);
-    //$('#saved_apps').html(data['saved']);
-    //$('#submitted_apps').html(data['submitted']);
-    //$('#approved_apps').html(data['approved']);
-    //$('#rejected_apps').html(data['rejected']);
-    //return $('#closed_apps').html(data['closed']);
   });
 };
 
@@ -375,8 +410,8 @@ getKey = function(val, source) {
 			<div id="control" style="width: 600px; height: 100px; position: relative;"></div>
 </div>
 
-<div class="span5" style="height:500px;overflow:auto;">	
-<div class="well sidebar-nav">
+<div class="span5" >	
+<div class="well sidebar-nav" style="height:500px;overflow:auto;">
 <h3>Text</h3><br>
 <div id="here">
                 <!-- <ul class="nav nav-list">
@@ -418,8 +453,12 @@ Using this method inside a form_for block will set the enclosing form’s encodi
 
 </div>
 <br>
+
+
+
 <div>
 <div class="span6">
+<hr />
 	<div id="data_chooser2">
 				<center>
 				<!-- <b>المؤشر:</b><br /> -->
@@ -445,8 +484,9 @@ Using this method inside a form_for block will set the enclosing form’s encodi
 			<div id="control2" style="width: 600px; height: 100px; position: relative;"></div>
 			
 </div>
-<div class="span5" style="height:500px;overflow:auto;">	
-<div class="well sidebar-nav">
+<div class="span5">	
+<hr />
+<div class="well sidebar-nav" style="height:500px;overflow:auto;">
 <h3>Text</h3><br>
 <div id="here2">
                 <!-- <ul class="nav nav-list">

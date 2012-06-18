@@ -8,6 +8,7 @@ SA::Application.routes.draw do
   resources :articles do
     collection do
       get 'get_count'
+      get 'get_mentions'
     end
   end
 

@@ -87,11 +87,35 @@ class ArticlesController < ApplicationController
     #all={'value'=> val, 'source'=> source}
     
      count=  [
-          ['2012-03-15', 2,22,234],
-          ['2012-03-16', 11,4,55],
-          ['2012-03-17', 76,5,23],
-          ['2012-03-18', 6,22,565]
+          ['2012-03-15', Random.rand(500),Random.rand(500),Random.rand(500)],
+          ['2012-03-16', Random.rand(500),Random.rand(500),Random.rand(500)],
+          ['2012-03-17', Random.rand(500),Random.rand(500),Random.rand(500)],
+          ['2012-03-18', Random.rand(500),Random.rand(500),Random.rand(500)]
         ]
     render json: count
   end
+  
+  def get_mentions
+    source=params[:src]
+    y = Date.new(2012, 3, 15)
+    z = Date.new(2012, 3, 16)
+    if source=="articles"
+      count=[
+          [y, 111,22,234,111,33],
+          [z, 11,242,34,119,3]
+        ]
+    elsif source=="comments"
+      count= [
+          [y, 1,2,3,4,33],
+          [z, 11,242,4,119,3]
+        ]
+    else
+      count= [
+          [y, 55,22,54,111,89],
+          [z, 11,34,34,77,3]
+        ]
+    end
+    render json: count
+ end
+
 end
