@@ -12,42 +12,125 @@
       // Set a callback to run when the Google Visualization API is loaded.
       google.setOnLoadCallback(drawChart);
 
+	 var chart, chart2,dataReceived, control, dashboard, data, data2, data_array, stat_titles, tag_colors, option, options2, view, allcolumns, hideCols;
+	 	dataReceived=[];
+	 	// dataReceived=[
+        // ['2-2-234',654,234,678],
+        // ['2,3,44',87,890,543],
+        // ['233-23-44',33,44,67],
+        // ['wf-d-d',33,44,55]
+        // ]
+	 	hideCols=new Array();
+	 	allcolumns=[0,1,2,3,4,5];
+		data_array = new Array();
+		stat_titles = new Array();
+		// tag_colors = new Array();
+		// tag_colors.push('red');
+		// tag_colors.push('green');
+		// tag_colors.push('blue');
+		// tag_colors.push('orange');
+		// tag_colors.push('lightblue');
+		// tag_colors.push('purple');
+		// tag_colors.push('maroon');
+		// tag_colors.push('olive'); 
+
       // Callback that creates and populates a data table, 
       // instantiates the pie chart, passes in the data and
       // draws it.
+      	
+      function updateStats() {
+		var radioObj = document.getElementsByName("stat");
+		var radioLength = radioObj.length;
+		for(var i = 0; i < radioLength; i++) {
+			if(radioObj[i].checked) {
+				var selected_stat = radioObj[i].value;
+			}
+		}
+		
+		console.debug(selected_stat)
+		data = data_array[selected_stat];
+		updateControlCandidates();
+		//chart.draw(data,options)
+		//chart.setDataTable(data_array[selected_stat]);
+		//chart.setOption("title", stat_titles[selected_stat]);
+		//updateCandidates();
+		//dashboard.draw(data);
+		}
+		
+		function updateStats2() {
+		
+		updateControlCandidates2();
+		
+		//chart.draw(data,options)
+		//chart.setDataTable(data_array[selected_stat]);
+		//chart.setOption("title", stat_titles[selected_stat]);
+		//updateCandidates();
+		//dashboard.draw(data);
+		}
+
+      
+      
+      
       function drawChart() {
 
-        // Create the data table.
-        // var data = new google.visualization.DataTable();
-        // data.addColumn('string', 'Topping');
-        // data.addColumn('number', 'Slices');
-        // data.addRows([
-          // ['Mushrooms', 3],
-          // ['Onions', 1],
-          // ['Olives', 1], 
-          // ['Zucchini', 1],
-          // ['Pepperoni', 2]
-        // ]);
-
-        // Set chart options
        
-        var data = google.visualization.arrayToDataTable([
-          ['Year', 'Sales', 'Expenses'],
-          ['2004',  1000,      400],
-          ['2005',  1170,      460],
-          ['2006',  660,       1120],
-          ['2007',  1030,      540]
-        ]);
+        data_array['articles'] = new google.visualization.DataTable();
+        data_array['articles'].addColumn('date','Date');
+        data_array['articles'].addColumn('number', 'Muslim Brotherhood')
+        data_array['articles'].addColumn('number', 'EFG Hermes')
+        data_array['articles'].addColumn('number', 'SCAF')
+        data_array['articles'].addColumn('number', 'Ahmed Shafik')
+        data_array['articles'].addColumn('number', 'Mohamed Morsi')
+        
+        
+        
+        data_array['articles'].addRows([
+        	[new Date('2012-03-15'), 111,22,234,111,33],
+        	[new Date('2012-03-16'), 11,242,34,119,3]
+        ])
+        
+        data_array['comments'] = new google.visualization.DataTable();
+        data_array['comments'].addColumn('date','Date');
+        data_array['comments'].addColumn('number', 'Muslim Brotherhood')
+        data_array['comments'].addColumn('number', 'EFG Hermes')
+        data_array['comments'].addColumn('number', 'SCAF')
+        data_array['comments'].addColumn('number', 'Ahmed Shafik')
+        data_array['comments'].addColumn('number', 'Mohamed Morsi')
+        
+        
+        
+        data_array['comments'].addRows([
+        	[new Date('2012-03-15'), 1,2,3,4,33],
+        	[new Date('2012-03-16'), 11,242,4,119,3]
+        ])
+        
+        data_array['twitter'] = new google.visualization.DataTable();
+        data_array['twitter'].addColumn('date','Date');
+        data_array['twitter'].addColumn('number', 'Muslim Brotherhood')
+        data_array['twitter'].addColumn('number', 'EFG Hermes')
+        data_array['twitter'].addColumn('number', 'SCAF')
+        data_array['twitter'].addColumn('number', 'Ahmed Shafik')
+        data_array['twitter'].addColumn('number', 'Mohamed Morsi')
+        
+        
+        
+        data_array['twitter'].addRows([
+        	[new Date('2012-03-15'), 55,22,54,111,89],
+        	[new Date('2012-03-16'), 11,34,34,77,3]
+        ])
+        
+    	data=data_array['articles']
 
-        var options = {
-          title: 'All Articles', 'width':500, 'height':400, 'legend.position':'bottom'
+        options = {
+          //title: 'All Articles',
+           'width':500, 'height':450
         };
 
       
  
         // Instantiate and draw our chart, passing in some options.
-        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-
+        chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+		
         // function selectHandler() {
           // var selectedItem = chart.getSelection()[0];
           // if (selectedItem) {
@@ -58,50 +141,183 @@
 
 	
 	 function selectHandler() {
-          var selection = chart.getSelection();
+	 	
+          var selection = chart.getSelection();  // what if view.. google.. then osman.
           var message =""
           
           for (var i = 0; i < selection.length; i++) {
 		    var item = selection[i];
 		    if (item.row != null && item.column != null) {
-		      message += data.getColumnLabel(item.column) + ' : ' + data.getValue(item.row, item.column) + ',date: ' + data.getValue(item.row, 0);  
+		    column=allcolumns[item.column];
+		      message += data.getColumnLabel(column) + ' : ' + data.getValue(item.row, column) + ',date: ' + data.getValue(item.row, 0);  
 		    } else if (item.row != null) {
 		      message += '{row:' + item.row + '}';
 		    } else if (item.column != null) {
-		      message += data.getColumnLabel(item.column);
+		      column=allcolumns[item.column];
+		      message += data.getColumnLabel(column);
+		
 		    }
 		  }
 		  if (message == '') {
 		    message = 'nothing';
 		  }
-		  alert('You selected ' + message);
+		  //alert('You selected ' + item.row + " " + item.column);
+		  $('#here').text(message)
 		          
         }
 	 
 
 
         google.visualization.events.addListener(chart, 'select', selectHandler);    
-        chart.draw(data, options);
+        chart.draw(data_array['articles'], options);
       }
+      
+      
+     google.setOnLoadCallback(drawChart2);
+      function drawChart2() {
+      	
+      	data2 = new google.visualization.DataTable();
+        data2.addColumn('string','Date');
+        data2.addColumn('number', 'Positive')
+        data2.addColumn('number', 'Neutral')
+        data2.addColumn('number', 'Negative')
+       
+        
+        
+        data2.addRows(dataReceived)
+        
+        // var data2 = google.visualization.arrayToDataTable([
+          // ['Date', 'Negative', 'Neutral', 'Positive'],
+          // ['2004',  1000,      400, 	100],
+          // ['2005',  1170,      460, 20],
+          // ['2006',  660,       1120, 200],
+          // ['2007',  1030,      540, 600]
+        // ]);
+        // xaxis must be string
 
+         options2 = {
+          //title: 'Company Performance',
+          //hAxis: {title: 'Year', titleTextStyle: {color: 'red'}},
+          isStacked: true,
+          colors: ['red','yellow','blue']
+        };
+
+        chart2 = new google.visualization.ColumnChart(document.getElementById('chart_div2'));
+        
+        
+        function selectHandler2() {
+	 	
+          var selection = chart2.getSelection();  
+          var message =""
+          
+          for (var i = 0; i < selection.length; i++) {
+		    var item = selection[i];
+		    if (item.row != null && item.column != null) {
+		      message += data2.getColumnLabel(item.column) + ' : ' + data2.getValue(item.row, item.column) + ',date: ' + data2.getValue(item.row, 0);  
+		    } else if (item.row != null) {
+		      message += '{row:' + item.row + '}';
+		    } else if (item.column != null) {
+		      message += data2.getColumnLabel(item.column);
+		
+		    }
+		  }
+		  if (message == '') {
+		    message = 'nothing';
+		  }
+		  //alert('You selected ' + item.row + " " + item.column);
+		  $('#here2').text(message)
+		          
+        }
+	 
+
+
+        google.visualization.events.addListener(chart2, 'select', selectHandler2);    
+
+        
+        chart2.draw(data2, options2);
+      }
+      
+ function updateControlCandidates2(a) {
+      	
+      	console.debug("a iss")
+      	console.debug(a)
+      	a=document.getElementById('keywords')
+      	val=a.options[a.selectedIndex].value
+      	// this is the keyword
+      	console.debug(val)
+      	
+      	var radioObj = document.getElementsByName("stat2");
+		var radioLength = radioObj.length;
+		for(var i = 0; i < radioLength; i++) {
+			if(radioObj[i].checked) {
+				var selected_stat = radioObj[i].value;
+			}
+		}
+		// this is the source
+      	
+      	
+		getKey(val, selected_stat);
+		
+		//chart.draw(data,options);
+	}
+	  
+      
+
+ function updateControlCandidates(a) {
+      	
+      	console.debug("a iss")
+      	console.debug(a)
+		var candidateList = document.getElementsByClassName("candidates");
+		var checkedCount = 0;
+		var columns= new Array();
+		columns.push(0);
+		for (var i = 0; i < candidateList.length; i++) {
+		if (candidateList[i].checked) //checkedCount++;
+		{
+			console.debug(candidateList[i].value)
+			columns.push(i+1)
+		}
+	   } 
+	   
+	   
+	    view = new google.visualization.DataView(data);
+		allcolumns=columns
+		
+		if(columns.length==1)
+		{
+		 document.getElementById(a.id).checked=true
+	   	 return
+		}
+		
+		view.setColumns(columns);
+		console.debug(columns)
+	      //chart.setColumns(columns);
+	      chart.draw(view,options);
+	}
 
 	 $(document).ready(function() {
-  return $("#semester_sel2").change(changeSemester2).trigger("change");
+  //return $("#semester_sel2").change(changeSemester2).trigger("change");
+  //updateStats();
+  updateControlCandidates2();
 });
 
     
-changeSemester2 = function() {
+getKey = function(val, source) {
   var url;
   url = void 0;
-  url = "/applicants/get_semester?sem=" + $(this).val();
-  return $.getJSON(url, function(data) {
-    console.log(data);
-    accept=data['approved']
-    reject=data['rejected']
-    submit=data['submitted']
-    save=data['saved']
-    close=data['closed']
-    drawChart()
+  url = "/articles/get_count";
+  return $.getJSON(url,{val:val, src:source} ,function(data5) {
+    console.log(data5);
+    
+    dataReceived=data5;
+    drawChart2();
+    
+    // accept=data['approved']
+    // reject=data['rejected']
+    // submit=data['submitted']
+    // save=data['saved']
+    // close=data['closed']
+    //drawChart()
     //$('#all_apps').html(data['all']);
     //$('#saved_apps').html(data['saved']);
     //$('#submitted_apps').html(data['submitted']);
@@ -116,52 +332,159 @@ changeSemester2 = function() {
 
 <!-- <div id="chart_div" style="width:400; height:300"></div> -->
 
+<div>
 <div class="span6">
 
 			<div id="dashboard" style="width: 600px; position: relative; float:right;"></div>
 			<div id="data_chooser">
 				<center>
-				<b>المؤشر:</b><br />
-				<input id="stat[قرائة أخبار كل مرشح]" type="radio" onclick="updateStats()" value="view_count" name="stat">
-				<label for="stat[قرائة أخبار كل مرشح]">قرائة أخبار كل مرشح</label>
-				<input id="stat[عدد أخبار كل مرشح]" type="radio" checked="yes" onclick="updateStats()" value="article_count" name="stat">
-				<label for="stat[عدد أخبار كل مرشح]">عدد أخبار كل مرشح</label>
-				<input id="stat[الشبكات الإجتماعية]" type="radio" onclick="updateStats()" value="fb_count" name="stat">
-				<label for="stat[الشبكات الإجتماعية]">الشبكات الإجتماعية</label>
+				<!-- <b>المؤشر:</b><br /> -->
+				
+				<%= radio_button_tag  'stat' ,'articles', true , :onclick =>"updateStats()"%>
+				<%= label_tag 'stat[articles]',  'Articles' %>
+				
+				<%= radio_button_tag  'stat' ,'comments', false , :onclick=>"updateStats()"%>
+				<%= label_tag 'stat[comments]',  'Comments' %>
+				
+				<%= radio_button_tag  'stat' ,'twitter', false , :onclick=> "updateStats()"%>
+				<%= label_tag 'stat[twitter]',  'Twitter' %>
+					
 				</center>
 			</div>
-			<div id="chart_div" style="width: 500px; height: 400px;"></div>
-			<center><div id="candidate_chooser" class="span5">
-				<input id="candidates[أبو اسماعيل]" type="checkbox" onclick="updateControlCandidates()" value="أبو اسماعيل" name="candidates">
-					<label for="candidates[أبو اسماعيل]">أبو اسماعيل</label>
-					<input id="candidates[خيرت الشاطر]" type="checkbox" checked="checked" onclick="updateControlCandidates()" value="خيرت الشاطر" name="candidates">
-					<label for="candidates[خيرت الشاطر]">خيرت الشاطر</label>
-					<input id="candidates[أبو الفتوح]" type="checkbox" onclick="updateControlCandidates()" value="أبو الفتوح" name="candidates">
-					<label for="candidates[أبو الفتوح]">أبو الفتوح</label>
-					<input id="candidates[عمر سليمان]" type="checkbox" onclick="updateControlCandidates()" value="عمر سليمان" name="candidates">
-					<label for="candidates[عمر سليمان]">عمر سليمان</label>
-					<input id="candidates[عمرو موسى]" type="checkbox" onclick="updateControlCandidates()" value="عمرو موسى" name="candidates">
-					<label for="candidates[عمرو موسى]">عمرو موسى</label>
-					<input id="candidates[محمد مرسي]" type="checkbox" checked="checked" onclick="updateControlCandidates()" value="محمد مرسي" name="candidates">
-					<label for="candidates[محمد مرسي]">محمد مرسي</label>
-					<input id="candidates[أحمد شفيق]" type="checkbox" onclick="updateControlCandidates()" value="أحمد شفيق" name="candidates">
-					<label for="candidates[أحمد شفيق]">أحمد شفيق</label>
-					<input id="candidates[حمدين صباحي]" type="checkbox" onclick="updateControlCandidates()" value="حمدين صباحي" name="candidates">
-					<label for="candidates[حمدين صباحي]">حمدين صباحي</label>
+			
+			<div id="chart_div" style="width: 500px; height: 450px;"></div>
+			<center><div id="candidate_chooser">
+				<!-- <input id="candidates[أبو اسماعيل]" type="checkbox" onclick="updateControlCandidates()" value="أبو اسماعيل" name="candidates"> -->
+					<%= check_box_tag  'candidates[1]' ,'Muslim Brotherhood', true , :onclick=>"updateControlCandidates(this)", :class => 'candidates'%>
+					<%= label_tag 'candidates[1]',  'Muslim Brotherhood' %>
+					
+					<%= check_box_tag  'candidates[2]' , 'EFG Hermes', true , :onclick=>"updateControlCandidates(this)" ,:class => 'candidates'%>
+					<%= label_tag 'candidates[2]', 'EFG Hermes' %>
+					
+					<%= check_box_tag  'candidates[3]' ,  'SCAF', true , :onclick=>"updateControlCandidates(this)", :class => 'candidates'%>
+					<%= label_tag 'candidates[3]', 'SCAF' %>
+					
+					<%= check_box_tag  'candidates[4]' , 'Ahmed Shafik', true , :onclick=>"updateControlCandidates(this)", :class => 'candidates'%>
+					<%= label_tag 'candidates[4]', 'Ahmed Shafik' %>
+					
+					<%= check_box_tag  'candidates[5]' , 'Mohamed Morsi', true , :onclick=>"updateControlCandidates(this)", :class => 'candidates'%>
+					<%= label_tag 'candidates[5]', 'Mohamed Morsi' %>
+					
+					
 			</div></center>
 			<div id="control" style="width: 600px; height: 100px; position: relative;"></div>
 </div>
-<div class="span5">	
+
+<div class="span5" style="height:500px;overflow:auto;">	
 <div class="well sidebar-nav">
 <h3>Text</h3><br>
+<div id="here">
                 <!-- <ul class="nav nav-list">
                   <li class="nav-header">Sidebar</li>
                   <li><%= link_to "Link1", "/path1"  %></li>
                   <li><%= link_to "Link2", "/path2"  %></li>
                   <li><%= link_to "Link3", "/path3"  %></li>
                 </ul> -->
-<p> Text here </p>
+                Text here Form helpers are designed to make working with resources much easier compared to using vanilla HTML.
+
+Forms for models are created with form_for. That method yields a form builder that knows the model the form is about. The form builder is thus able to generate default values for input fields that correspond to model attributes, and also convenient names, IDs, endpoints, etc.
+
+Conventions in the generated field names allow controllers to receive form data nicely structured in params with no effort on your side.
+When the object belonging to the current scope has a nested attribute writer for a certain attribute, #fields_for will yield a new scope for that attribute. This allows you to create forms that set or change the attributes of a parent object and its associations in one go.
+
+Nested attribute writers are normal setter methods named after an association. The most common way of defining these writers is either with accepts_nested_attributes_for in a model definition or by defining a method with the proper name. For example: the attribute writer for the association :address is called address_attributes=.
+
+Whether a one-to-one or one-to-many style form builder will be yielded depends on whether the normal reader method returns a single object or an array of objects.
+Returns a file upload input tag tailored for accessing a specified attribute (identified by method) on an object assigned to the template (identified by object). Additional options on the input tag can be passed as a hash with options. These options will be tagged onto the HTML as an HTML element attribute as in the example shown.
+
+Using this method inside a form_for block will set the enclosing form’s encoding to multipart/form-data.
+Text here Form helpers are designed to make working with resources much easier compared to using vanilla HTML.
+
+Forms for models are created with form_for. That method yields a form builder that knows the model the form is about. The form builder is thus able to generate default values for input fields that correspond to model attributes, and also convenient names, IDs, endpoints, etc.
+
+Conventions in the generated field names allow controllers to receive form data nicely structured in params with no effort on your side.
+When the object belonging to the current scope has a nested attribute writer for a certain attribute, #fields_for will yield a new scope for that attribute. This allows you to create forms that set or change the attributes of a parent object and its associations in one go.
+
+Nested attribute writers are normal setter methods named after an association. The most common way of defining these writers is either with accepts_nested_attributes_for in a model definition or by defining a method with the proper name. For example: the attribute writer for the association :address is called address_attributes=.
+
+Whether a one-to-one or one-to-many style form builder will be yielded depends on whether the normal reader method returns a single object or an array of objects.
+Returns a file upload input tag tailored for accessing a specified attribute (identified by method) on an object assigned to the template (identified by object). Additional options on the input tag can be passed as a hash with options. These options will be tagged onto the HTML as an HTML element attribute as in the example shown.
+
+Using this method inside a form_for block will set the enclosing form’s encoding to multipart/form-data.
+</div>
 
 </div>
+</div>
+
+</div>
+<br>
+<div>
+<div class="span6">
+	<div id="data_chooser2">
+				<center>
+				<!-- <b>المؤشر:</b><br /> -->
+				
+				<%= radio_button_tag  'stat2' ,'articles', true , :onclick =>"updateStats2()"%>
+				<%= label_tag 'stat[articles]',  'Articles' %>
+				
+				<%= radio_button_tag  'stat2' ,'comments', false , :onclick=>"updateStats2()"%>
+				<%= label_tag 'stat[comments]',  'Comments' %>
+				
+				<%= radio_button_tag  'stat2' ,'twitter', false , :onclick=> "updateStats2()"%>
+				<%= label_tag 'stat[twitter]',  'Twitter' %>
+					
+				</center>
+			</div>
+			
+			<div id="chart_div2" style="width: 500px; height: 450px;"></div>
+			<center><div id="candidate_chooser2">
+					<%= select_tag 'keywords', options_for_select(['Muslim Brotherhood','EFG Hermes', 'SCAF', 'Ahmed Shafik', 'Mohamed Morsi']) , :onchange =>"updateControlCandidates2(this)"%>
+				<!-- <input id="candidates[أبو اسماعيل]" type="checkbox" onclick="updateControlCandidates()" value="أبو اسماعيل" name="candidates"> -->
+					
+			</div></center>
+			<div id="control2" style="width: 600px; height: 100px; position: relative;"></div>
+			
+</div>
+<div class="span5" style="height:500px;overflow:auto;">	
+<div class="well sidebar-nav">
+<h3>Text</h3><br>
+<div id="here2">
+                <!-- <ul class="nav nav-list">
+                  <li class="nav-header">Sidebar</li>
+                  <li><%= link_to "Link1", "/path1"  %></li>
+                  <li><%= link_to "Link2", "/path2"  %></li>
+                  <li><%= link_to "Link3", "/path3"  %></li>
+                </ul> -->
+   Text here Form helpers are designed to make working with resources much easier compared to using vanilla HTML.
+
+Forms for models are created with form_for. That method yields a form builder that knows the model the form is about. The form builder is thus able to generate default values for input fields that correspond to model attributes, and also convenient names, IDs, endpoints, etc.
+
+Conventions in the generated field names allow controllers to receive form data nicely structured in params with no effort on your side.
+When the object belonging to the current scope has a nested attribute writer for a certain attribute, #fields_for will yield a new scope for that attribute. This allows you to create forms that set or change the attributes of a parent object and its associations in one go.
+
+Nested attribute writers are normal setter methods named after an association. The most common way of defining these writers is either with accepts_nested_attributes_for in a model definition or by defining a method with the proper name. For example: the attribute writer for the association :address is called address_attributes=.
+
+Whether a one-to-one or one-to-many style form builder will be yielded depends on whether the normal reader method returns a single object or an array of objects.
+Returns a file upload input tag tailored for accessing a specified attribute (identified by method) on an object assigned to the template (identified by object). Additional options on the input tag can be passed as a hash with options. These options will be tagged onto the HTML as an HTML element attribute as in the example shown.
+
+Using this method inside a form_for block will set the enclosing form’s encoding to multipart/form-data.
+Text here Form helpers are designed to make working with resources much easier compared to using vanilla HTML.
+
+Forms for models are created with form_for. That method yields a form builder that knows the model the form is about. The form builder is thus able to generate default values for input fields that correspond to model attributes, and also convenient names, IDs, endpoints, etc.
+
+Conventions in the generated field names allow controllers to receive form data nicely structured in params with no effort on your side.
+When the object belonging to the current scope has a nested attribute writer for a certain attribute, #fields_for will yield a new scope for that attribute. This allows you to create forms that set or change the attributes of a parent object and its associations in one go.
+
+Nested attribute writers are normal setter methods named after an association. The most common way of defining these writers is either with accepts_nested_attributes_for in a model definition or by defining a method with the proper name. For example: the attribute writer for the association :address is called address_attributes=.
+
+Whether a one-to-one or one-to-many style form builder will be yielded depends on whether the normal reader method returns a single object or an array of objects.
+Returns a file upload input tag tailored for accessing a specified attribute (identified by method) on an object assigned to the template (identified by object). Additional options on the input tag can be passed as a hash with options. These options will be tagged onto the HTML as an HTML element attribute as in the example shown.
+
+Using this method inside a form_for block will set the enclosing form’s encoding to multipart/form-data.
+</div>
+
+</div>
+</div>
+
 </div>
 

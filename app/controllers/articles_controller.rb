@@ -80,4 +80,18 @@ class ArticlesController < ApplicationController
       format.json { head :no_content }
     end
   end
+  
+  def get_count
+    val=params[:val]
+    source=params[:src]
+    #all={'value'=> val, 'source'=> source}
+    
+     count=  [
+          ['2012-03-15', 2,22,234],
+          ['2012-03-16', 11,4,55],
+          ['2012-03-17', 76,5,23],
+          ['2012-03-18', 6,22,565]
+        ]
+    render json: count
+  end
 end

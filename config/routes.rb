@@ -5,7 +5,11 @@ SA::Application.routes.draw do
 
   resources :comments
 
-  resources :articles
+  resources :articles do
+    collection do
+      get 'get_count'
+    end
+  end
 
   resources :sources
 
