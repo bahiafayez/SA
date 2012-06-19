@@ -1,0 +1,249 @@
+<STYLE type="text/css">
+   label {display:inline}
+   input {display: inline}
+ </STYLE>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      //google.setOnLoadCallback(drawChart);
+
+	 var chart, d1, d2, d3, chart2,dataReceived, control, dashboard, data, data2, data_array, stat_titles, tag_colors, option, options2, view, allcolumns, hideCols;
+	 	dataReceived=[];
+	 	d1=[];
+	 	d2=[];
+	 	d3=[];
+	 	
+	 	// dataReceived=[
+        // ['2-2-234',654,234,678],
+        // ['2,3,44',87,890,543],
+        // ['233-23-44',33,44,67],
+        // ['wf-d-d',33,44,55]
+        // ]
+	 	hideCols=new Array();
+	 	allcolumns=[0,1,2,3,4,5];
+		data_array = new Array();
+		stat_titles = new Array();
+		// tag_colors = new Array();
+		// tag_colors.push('red');
+		// tag_colors.push('green');
+		// tag_colors.push('blue');
+		// tag_colors.push('orange');
+		// tag_colors.push('lightblue');
+		// tag_colors.push('purple');
+		// tag_colors.push('maroon');
+		// tag_colors.push('olive'); 
+
+      // Callback that creates and populates a data table, 
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      	
+      
+		
+		function updateStats2() {
+		
+		updateControlCandidates2();
+		
+		//chart.draw(data,options)
+		//chart.setDataTable(data_array[selected_stat]);
+		//chart.setOption("title", stat_titles[selected_stat]);
+		//updateCandidates();
+		//dashboard.draw(data);
+		}
+
+      
+      
+      
+      
+      
+     google.setOnLoadCallback(drawChart2);
+      function drawChart2() {
+      	
+      	data2 = new google.visualization.DataTable();
+        data2.addColumn('string','Date');
+        data2.addColumn('number', 'Negative')
+        data2.addColumn('number', 'Neutral')
+        data2.addColumn('number', 'Positive')
+       
+        
+        
+        data2.addRows(dataReceived)
+        
+        // var data2 = google.visualization.arrayToDataTable([
+          // ['Date', 'Negative', 'Neutral', 'Positive'],
+          // ['2004',  1000,      400, 	100],
+          // ['2005',  1170,      460, 20],
+          // ['2006',  660,       1120, 200],
+          // ['2007',  1030,      540, 600]
+        // ]);
+        // xaxis must be string
+
+         options2 = {
+          //title: 'Company Performance',
+          //hAxis: {title: 'Year', titleTextStyle: {color: 'red'}},
+          isStacked: true,
+          colors: ['red','yellow','#00AA11']
+        };
+
+        chart2 = new google.visualization.ColumnChart(document.getElementById('chart_div2'));
+        
+        
+        function selectHandler2() {
+	 	
+          var selection = chart2.getSelection();  
+          var message =""
+          
+          for (var i = 0; i < selection.length; i++) {
+		    var item = selection[i];
+		    if (item.row != null && item.column != null) {
+		      message += data2.getColumnLabel(item.column) + ' : ' + data2.getValue(item.row, item.column) + ',date: ' + data2.getValue(item.row, 0);  
+		    } else if (item.row != null) {
+		      message += '{row:' + item.row + '}';
+		    } else if (item.column != null) {
+		      message += data2.getColumnLabel(item.column);
+		
+		    }
+		  }
+		  if (message == '') {
+		    message = 'nothing';
+		  }
+		  //alert('You selected ' + item.row + " " + item.column);
+		  $('#here2').text(message)
+		          
+        }
+	 
+
+
+        google.visualization.events.addListener(chart2, 'select', selectHandler2);    
+
+        
+        chart2.draw(data2, options2);
+      }
+      
+ function updateControlCandidates2(a) {
+      	
+      	console.debug("a iss")
+      	console.debug(a)
+      	a=document.getElementById('keywords')
+      	val=a.options[a.selectedIndex].value
+      	// this is the keyword
+      	console.debug(val)
+      	
+      	var radioObj = document.getElementsByName("stat2");
+		var radioLength = radioObj.length;
+		for(var i = 0; i < radioLength; i++) {
+			if(radioObj[i].checked) {
+				var selected_stat = radioObj[i].value;
+			}
+		}
+		// this is the source
+      	
+      	
+		getKey(val, selected_stat);
+		
+		//chart.draw(data,options);
+	}
+	  
+      
+
+ 
+
+	 $(document).ready(function() {
+  //return $("#semester_sel2").change(changeSemester2).trigger("change");
+  //updateStats();
+  updateControlCandidates2();
+  //getFirstChart();
+});
+
+
+getKey = function(val, source) {
+  var url;
+  url = void 0;
+  url = "/articles/get_count";
+  return $.getJSON(url,{val:val, src:source} ,function(data5) {
+    console.log(data5);
+    
+    dataReceived=data5;
+    drawChart2();
+     
+  });
+};
+
+
+    </script>
+<div>
+<div class="span6">
+<hr />
+	<div id="data_chooser2">
+				<center>
+				<!-- <b>المؤشر:</b><br /> -->
+				
+				<%= radio_button_tag  'stat2' ,'articles', true , :onclick =>"updateStats2()"%>
+				<%= label_tag 'stat[articles]',  'Articles' %>
+				
+				<%= radio_button_tag  'stat2' ,'comments', false , :onclick=>"updateStats2()"%>
+				<%= label_tag 'stat[comments]',  'Comments' %>
+				
+				<%= radio_button_tag  'stat2' ,'twitter', false , :onclick=> "updateStats2()"%>
+				<%= label_tag 'stat[twitter]',  'Twitter' %>
+					
+				</center>
+			</div>
+			
+			<div id="chart_div2" style="width: 500px; height: 450px;"></div>
+			<center><div id="candidate_chooser2">
+					<%= select_tag 'keywords', options_for_select(['Muslim Brotherhood','EFG Hermes', 'SCAF', 'Ahmed Shafik', 'Mohamed Morsi']) , :onchange =>"updateControlCandidates2(this)"%>
+				<!-- <input id="candidates[أبو اسماعيل]" type="checkbox" onclick="updateControlCandidates()" value="أبو اسماعيل" name="candidates"> -->
+					
+			</div></center>
+			<div id="control2" style="width: 600px; height: 100px; position: relative;"></div>
+			
+</div>
+<div class="span5">	
+<hr />
+<div class="well sidebar-nav" style="height:500px;overflow:auto;">
+<h3>Text</h3><br>
+<div id="here2">
+                <!-- <ul class="nav nav-list">
+                  <li class="nav-header">Sidebar</li>
+                  <li><%= link_to "Link1", "/path1"  %></li>
+                  <li><%= link_to "Link2", "/path2"  %></li>
+                  <li><%= link_to "Link3", "/path3"  %></li>
+                </ul> -->
+   Text here Form helpers are designed to make working with resources much easier compared to using vanilla HTML.
+
+Forms for models are created with form_for. That method yields a form builder that knows the model the form is about. The form builder is thus able to generate default values for input fields that correspond to model attributes, and also convenient names, IDs, endpoints, etc.
+
+Conventions in the generated field names allow controllers to receive form data nicely structured in params with no effort on your side.
+When the object belonging to the current scope has a nested attribute writer for a certain attribute, #fields_for will yield a new scope for that attribute. This allows you to create forms that set or change the attributes of a parent object and its associations in one go.
+
+Nested attribute writers are normal setter methods named after an association. The most common way of defining these writers is either with accepts_nested_attributes_for in a model definition or by defining a method with the proper name. For example: the attribute writer for the association :address is called address_attributes=.
+
+Whether a one-to-one or one-to-many style form builder will be yielded depends on whether the normal reader method returns a single object or an array of objects.
+Returns a file upload input tag tailored for accessing a specified attribute (identified by method) on an object assigned to the template (identified by object). Additional options on the input tag can be passed as a hash with options. These options will be tagged onto the HTML as an HTML element attribute as in the example shown.
+
+Using this method inside a form_for block will set the enclosing form’s encoding to multipart/form-data.
+Text here Form helpers are designed to make working with resources much easier compared to using vanilla HTML.
+
+Forms for models are created with form_for. That method yields a form builder that knows the model the form is about. The form builder is thus able to generate default values for input fields that correspond to model attributes, and also convenient names, IDs, endpoints, etc.
+
+Conventions in the generated field names allow controllers to receive form data nicely structured in params with no effort on your side.
+When the object belonging to the current scope has a nested attribute writer for a certain attribute, #fields_for will yield a new scope for that attribute. This allows you to create forms that set or change the attributes of a parent object and its associations in one go.
+
+Nested attribute writers are normal setter methods named after an association. The most common way of defining these writers is either with accepts_nested_attributes_for in a model definition or by defining a method with the proper name. For example: the attribute writer for the association :address is called address_attributes=.
+
+Whether a one-to-one or one-to-many style form builder will be yielded depends on whether the normal reader method returns a single object or an array of objects.
+Returns a file upload input tag tailored for accessing a specified attribute (identified by method) on an object assigned to the template (identified by object). Additional options on the input tag can be passed as a hash with options. These options will be tagged onto the HTML as an HTML element attribute as in the example shown.
+
+Using this method inside a form_for block will set the enclosing form’s encoding to multipart/form-data.
+</div>
+
+</div>
+</div>
+
+</div>
+

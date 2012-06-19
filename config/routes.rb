@@ -1,18 +1,25 @@
 SA::Application.routes.draw do
-  get "charts/index"
+  ActiveAdmin.routes(self)
 
+  devise_for :admin_users, ActiveAdmin::Devise.config
+
+  get "charts/index"
+  match "/charts/sentiment" => "charts#sentiment"
+
+  match "/articles/get_count" => "articles#get_count"
+  match "/articles/get_mentions" => "articles#get_mentions"
   #get "home/index"
 
-  resources :comments
+  #resources :comments
 
-  resources :articles do
-    collection do
-      get 'get_count'
-      get 'get_mentions'
-    end
-  end
+  # resources :articles do
+    # collection do
+      # get 'get_count'
+      # get 'get_mentions'
+    # end
+  # end
 
-  resources :sources
+  #resources :sources
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
