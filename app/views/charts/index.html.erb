@@ -175,9 +175,9 @@
       	
       	data2 = new google.visualization.DataTable();
         data2.addColumn('string','Date');
-        data2.addColumn('number', 'Positive')
-        data2.addColumn('number', 'Neutral')
         data2.addColumn('number', 'Negative')
+        data2.addColumn('number', 'Neutral')
+        data2.addColumn('number', 'Positive')
        
         
         
@@ -196,7 +196,7 @@
           //title: 'Company Performance',
           //hAxis: {title: 'Year', titleTextStyle: {color: 'red'}},
           isStacked: true,
-          colors: ['red','yellow','blue']
+          colors: ['red','yellow','#00AA11']
         };
 
         chart2 = new google.visualization.ColumnChart(document.getElementById('chart_div2'));
