@@ -69,12 +69,12 @@
 
        
         data_array['articles'] = new google.visualization.DataTable();
-        data_array['articles'].addColumn('date','Date');
+        data_array['articles'].addColumn('datetime','Date');
         data_array['articles'].addColumn('number', 'Muslim Brotherhood')
         data_array['articles'].addColumn('number', 'EFG Hermes')
         data_array['articles'].addColumn('number', 'SCAF')
         data_array['articles'].addColumn('number', 'Ahmed Shafik')
-        data_array['articles'].addColumn('number', 'Mohamed Morsi')
+        data_array['articles'].addColumn('number', 'Morsi')
         
         
         
@@ -86,7 +86,7 @@
         data_array['comments'].addColumn('number', 'EFG Hermes')
         data_array['comments'].addColumn('number', 'SCAF')
         data_array['comments'].addColumn('number', 'Ahmed Shafik')
-        data_array['comments'].addColumn('number', 'Mohamed Morsi')
+        data_array['comments'].addColumn('number', 'Morsi')
         
         
         
@@ -98,7 +98,7 @@
         data_array['twitter'].addColumn('number', 'EFG Hermes')
         data_array['twitter'].addColumn('number', 'SCAF')
         data_array['twitter'].addColumn('number', 'Ahmed Shafik')
-        data_array['twitter'].addColumn('number', 'Mohamed Morsi')
+        data_array['twitter'].addColumn('number', 'Morsi')
         
         
         
@@ -149,6 +149,15 @@
 		    message = 'nothing';
 		  }
 		  //alert('You selected ' + item.row + " " + item.column);
+		  var radioObj = document.getElementsByName("stat");
+			var radioLength = radioObj.length;
+			for(var i = 0; i < radioLength; i++) {
+				if(radioObj[i].checked) {
+					var selected_stat = radioObj[i].value;
+				}
+			}
+		  
+		  getText(data.getColumnLabel(column), data.getValue(item.row, 0), selected_stat)
 		  $('#here').text(message)
 		          
         }
@@ -243,14 +252,27 @@ getFirstChart = function() {
    $.getJSON(url,{src:"twitter"} ,function(data5) {
     console.log(data5);
     
+    console.debug("date is")
+    console.debug(data5[0][0])
     for(var i=0; i<data5.length; i++)
     {
-    	console.debug(data5[i][0])
+    	//console.debug(data5[i][0])
     	data5[i][0]= new Date(data5[i][0])
     }
     d3=data5;
     drawChart();
     //chart.draw()
+      });
+};
+
+getText = function(keyword, date, stat) {
+  var url;
+  url = void 0;
+  url = "/articles/get_text";
+  $.getJSON(url,{keyword:keyword, date:date, stat:stat} ,function(data5) {
+    console.log(data5);
+    
+  
       });
 };
       
@@ -294,8 +316,8 @@ getFirstChart = function() {
 					<%= check_box_tag  'candidates[4]' , 'Ahmed Shafik', true , :onclick=>"updateControlCandidates(this)", :class => 'candidates'%>
 					<%= label_tag 'candidates[4]', 'Ahmed Shafik' %>
 					
-					<%= check_box_tag  'candidates[5]' , 'Mohamed Morsi', true , :onclick=>"updateControlCandidates(this)", :class => 'candidates'%>
-					<%= label_tag 'candidates[5]', 'Mohamed Morsi' %>
+					<%= check_box_tag  'candidates[5]' , 'Morsi', true , :onclick=>"updateControlCandidates(this)", :class => 'candidates'%>
+					<%= label_tag 'candidates[5]', 'Morsi' %>
 					
 					
 			</div></center>

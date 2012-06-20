@@ -110,12 +110,45 @@ class ArticlesController < ApplicationController
           [z, 11,242,4,119,3]
         ]
     else
-      count= [
-          [y, 55,22,54,111,89],
-          [z, 11,34,34,77,3]
-        ]
+      # count= [
+          # [y, 55,22,54,111,89],
+          # [z, 11,34,34,77,3]
+        # ]
+        s=Source.find_by_name("Twitter")
+        #Article.where(:source_id => s.id)
+        #Article.joins(:keywords).where('keywords.name'=> "Morsi").count
+        count=[]
+        @a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> "Morsi").count(group: :date)
+        @a.each do |a|
+          count<< [a[0],0,0,0,0,a[1]]
+        end
     end
     render json: count
  end
 
+  def get_text
+    keyword=params[:keyword]
+    date=params[:date]
+    stat=params[:stat]
+    
+    checkdate= Time.zone.parse(date).utc.to_formatted_s(:db)
+    print "checkdate issss"
+    print checkdate
+    
+    s=Source.find(:first, :conditions => [ "lower(name) = ?", stat.downcase ])
+    
+        text=[]
+        @a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> keyword, 'articles.date'=>checkdate)
+        @a.each do |a|
+          text<< a.body
+        end
+    
+    render json: text
+ end
+
+
 end
+
+#Assume we want Morsi
+
+

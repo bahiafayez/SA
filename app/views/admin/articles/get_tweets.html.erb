@@ -1,0 +1,7 @@
+Choose a Keyword: 
+<%= form_tag "get_tweets2" do %>
+
+	<%= select_tag :keyword, options_from_collection_for_select(Keyword.all, :id, :name) %>
+	<%= submit_tag "Get Tweets" %>
+	
+<% end %>

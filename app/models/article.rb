@@ -10,7 +10,9 @@ class Article < ActiveRecord::Base
   
   
   def self.getTweets(keyword_id)
-    keyword=Keyword.find(keyword_id)
+    keyword=Keyword.find(keyword_id.to_i)
+    print "keyword id issssss"
+    puts keyword
     synonyms= Synonym.where(:keyword_id => keyword_id)
     search=[]
     synonyms.each do |s|
@@ -18,7 +20,7 @@ class Article < ActiveRecord::Base
     end
     search=search.join(" OR ")
     search=URI::encode(search)
-    pp search
+    print search
     #search= keyword.name  #later get synonyms
     
     
@@ -32,11 +34,11 @@ class Article < ActiveRecord::Base
   	print "Stopped is #{stop}"
   	
   	#maxid won't change as im going backwards
-  	while stop.to_i > max_id.to_i do
-    	p=Tweets.new()
-      a, stop= p.getTweets(keyword_id,search, max_id , stop) #removed numpages for now. £old max_id.. 0
-      print a 
-    end
+  	# while stop.to_i > max_id.to_i do
+    	# p=Tweets.new()
+      # a, stop= p.getTweets(keyword_id,search, max_id , stop) #removed numpages for now. £old max_id.. 0
+      # print a 
+    # end
     
     #Still max is 1500!
   end

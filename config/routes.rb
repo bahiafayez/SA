@@ -13,6 +13,7 @@ SA::Application.routes.draw do
 
   match "/articles/get_count" => "articles#get_count"
   match "/articles/get_mentions" => "articles#get_mentions"
+  match "/articles/get_text" => "articles#get_text"
   #get "home/index"
 
   #resources :comments
