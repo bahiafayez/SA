@@ -1,7 +1,10 @@
+# encoding: utf-8
+
 require "net/http"
 require "uri"
 require "rails"
 require "active_record"
+require "open-uri"
 
 class Tweets < ActiveRecord::Base
 
@@ -9,41 +12,55 @@ class Tweets < ActiveRecord::Base
   def initialize()
     @url_search='http://search.twitter.com/search.json'
     @map_tweets={}
+    @kid=""
+    @stopped=0
   end
 
-  def getTweets(hash_tag, id, num_pages) #this id to say start from which (since_id...)
-    url= "#{@url_search}?q=#{hash_tag}&rpp=100&since_id=#{id}"
-    pp Article.first
-	max_id=''
-	i=1
-	while i<num_pages and url != '' do
-		print i, ' - ', url
-		mp, max_id, next_page= getTweets2(url)
-		if next_page == ''
-			url= ''
-		else
-			url = "#{@url_search}#{next_page}"
-		end
-		i=i+1
-	end
-	return max_id
+  def getTweets(kid, hash_tag, id ,stop) #, num_pages #this id to say start from which (since_id...)
+    @kid=kid
+    #hash_tag=URI::encode("\"#{hash_tag}\"") # to search for exact phrase
+    print "hashtag is #{hash_tag}"
+    if stop== -1
+      url= "#{@url_search}?q=#{hash_tag}&rpp=100&since_id=#{id}"
+    else
+      url= "#{@url_search}?q=#{hash_tag}&rpp=100&since_id=#{id}&max_id=#{stop}"
+    end
+    
+    #pp Article.first
+  	max_id=''
+  	i=1
+  	while url != '' and i<20 do 
+  		print i, ' - ', url
+  		mp, max_id, next_page= getTweets2(url)
+  		print "-----------------------------next_page issss #{next_page}"
+  		if next_page == ''
+  			url= ''
+  		else
+  			url = "#{@url_search}#{next_page}"
+  		end
+  		i=i+1
+  	end
+  	#before returning save the tweets
+  	
+  	return [max_id, @stopped]
   end
   
   def getTweets2(url)
 	resp=roundGetResponse(url)
 	#print "other response ISSS"
-	print resp
+	#print resp
 	puts "-------------------------------------------"
 	#resp = ActiveSupport::JSON.decode resp
 	i=1
 	while resp.has_key?("error") and (resp['error'] == 'Invalid query' or resp['error'] == 'You have been rate limited. Enhance your calm.') do
 		print "Try #{i}, Err: #{resp['error']} " 
+		sleep(5)
 		i=i+1
 		resp = roundGetResponse(url)
 		#resp = ActiveSupport::JSON.decode resp
 	end
 	
-	if resp.has_key?("results")
+	if !resp.nil? and resp.has_key?("results")
 		results=resp['results']
 		max_id= resp['max_id_str']
 		next_page=''
@@ -54,6 +71,7 @@ class Tweets < ActiveRecord::Base
 		return [@map_tweets, max_id, next_page]
 	else
 		print "Error #{resp}"
+		#return [0,0,0]
 	end
   end
   
@@ -62,8 +80,25 @@ class Tweets < ActiveRecord::Base
     map_tweets={}
 	results.each do |r|
 		k= r['id_str']
+		@stopped=k
 		v= r['text']
 		v2= r['created_at']
+		# Store here directly
+		s=Source.find_by_name("Twitter")
+		
+		
+		if Article.find_by_id_str(k).nil? #article not stored
+		  #url??
+		  a= Article.create(:id_str => k, :body => v, :source_id=> s.id, :date=> v2)
+		else #article stored 
+		  a = Article.find_by_id_str(k)
+		  print "HEEREEEEEEEEEEEEEEEEEEEEEEEEEE and k is #{k} and article id is #{a.id}"
+		end
+		  kk=Keyword.find(@kid)
+		  if !a.keywords.include?(kk)
+		    a.article_keywords.create(:keyword_id => @kid, :score=>1)
+		   end
+		
 		map_tweets[k.to_i] = [v2,v]
 	end
 	return map_tweets
@@ -108,6 +143,9 @@ class Tweets < ActiveRecord::Base
 		rescue Exception => e  
 			puts e.message  
 			puts e.backtrace.inspect
+			#puts "Try again"
+			#sleep(10)
+			#roundGetResponse(url)
 		end
 	#end
 	return resp
