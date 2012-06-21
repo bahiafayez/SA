@@ -39,7 +39,8 @@
           for (var i = 0; i < selection.length; i++) {
 		    var item = selection[i];
 		    if (item.row != null && item.column != null) {
-		     getText(<%= @val %>, data11.getValue(item.row, 0), "<%= @src %>")
+		     charttype=document.getElementById('stat').value	
+		     getText(<%= @val %>, data11.getValue(item.row, 0), "<%= @src %>", charttype)
 		      message += data11.getColumnLabel(item.column) + ' : ' + data11.getValue(item.row, item.column) + ',date: ' + data11.getValue(item.row, 0);  
 		    } else if (item.row != null) {
 		      message += '{row:' + item.row + '}';
@@ -66,12 +67,16 @@
         chart11.draw(data11, options11);
       }
       
+      updatestat = function()
+      {
+      	getKey(<%= @val %>, "<%= @src %>", document.getElementById("stat").value)
+      }
 
-		getText = function(keyword, date, stat) {
+		getText = function(keyword, date, stat, charttype) {
 		  var url;
 		  url = void 0;
 		  url = "/articles/get_text";
-		  $.getJSON(url,{keyword:keyword, date:date, stat:stat} ,function(data5) {
+		  $.getJSON(url,{keyword:keyword, date:date, stat:stat, charttype:charttype} ,function(data5) {
 		    console.log(data5);
 		    message=""
 		    for(var i=0; i<data5.length; i++)
@@ -91,15 +96,15 @@
 	});
 
 
-getKey = function(val, source) {
+getKey = function(val, source, stat) {
   var url;
   url = void 0;
   url = "/articles/get_mentions";
-  return $.getJSON(url,{val:val, src:source} ,function(data5) {
+  return $.getJSON(url,{val:val, src:source, stat:stat} ,function(data5) {
     //console.log(data5);
     for(var i=0; i<data5.length; i++)
     {
-    	//console.debug(data5[i][0])
+    	console.debug(data5[i][0])
     	data5[i][0]= new Date(data5[i][0])
     }
     dataReceived=data5;
@@ -113,7 +118,7 @@ getKey = function(val, source) {
 <div>
 	
 	<center><div id="candidate_chooser2">
-					<%= select_tag 'stat', options_for_select(["per hour", "per day"]) , :onchange =>"updatestat"%>
+					<%= select_tag 'stat', options_for_select(["per hour", "per day"]) , :onchange =>"updatestat()"%>
 					
 	</div></center>
 			

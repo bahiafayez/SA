@@ -121,12 +121,31 @@ class ArticlesController < ApplicationController
         #@a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> "Morsi").count(group: :date)
         @a= Article.where(:source_id=>s.id, :target_id=> params[:val])#.count(group: :date)
         gg=0
-        @a.group_by(&:hour).sort.each do |hour, posts|
+        
+        if params[:stat]=="per hour"
+          @a.group_by(&:hour).sort.each do |hour, posts|
           print "Here"
           gg=gg+posts.count
           print "#{hour} : #{posts.count}"
           count<<[hour,posts.count]
+          end
+        elsif params[:stat]=="per day"
+          @a.group_by(&:day).sort.each do |hour, posts|
+          print "Here"
+          gg=gg+posts.count
+          print "#{hour} : #{posts.count}"
+          count<<[hour,posts.count]
+          end
+        else
+          @a.group_by(&:hour).sort.each do |hour, posts|
+          print "Here"
+          gg=gg+posts.count
+          print "#{hour} : #{posts.count}"
+          count<<[hour,posts.count]
+          end
         end
+        
+        
         print "gg issss #{gg}"
         # @a.each do |a|
           # count<< [a[0],0,0,0,0,a[1]]
@@ -139,15 +158,20 @@ class ArticlesController < ApplicationController
     keyword=params[:keyword]
     date=params[:date]
     stat=params[:stat]
+    type=params[:charttype]
     
-    
-    date2= 1.minutes.since date.to_datetime
+    if type=="per day"
+      a= 1.days.since Time.parse(date)
+    else
+      a= 1.hours.since Time.parse(date)
+    end
+     date2= 1.minutes.since date.to_datetime
     date3=date.to_datetime
     print date2
     print date3
     checkdate= Time.parse(date).to_formatted_s(:db)
     print "over hereeeeee"
-    a= 1.minutes.since Time.parse(date)
+    #a= 1.minutes.since Time.parse(date)
     checkdate2=a.to_formatted_s(:db)
     # checkdate2= Time.zone.parse(date2).utc.to_formatted_s(:db)
     # print "checkdate issss"

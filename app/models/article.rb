@@ -7,10 +7,17 @@ class Article < ActiveRecord::Base
   
   belongs_to :target
   
-  def hour
+  def minute
     self.date.strftime('%d %B, %Y %H:%M')
   end
   
+  def hour
+    self.date.strftime('%d %B, %Y %H:00')
+  end
+  
+  def day
+    self.date.strftime('%d %B, %Y')
+  end
   
   def self.getTweets2()
     Target.all.each do |t|
