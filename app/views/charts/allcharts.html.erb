@@ -22,6 +22,7 @@
         data11.addColumn('datetime','Date');
         data11.addColumn('number', 'Mentions')
       
+      	
         data11.addRows(dataReceived)
  
          options11 = {
@@ -31,10 +32,20 @@
 
         chart11 = new google.visualization.LineChart(document.getElementById('chart_div11'));
         
+        
+        
+        
+        
         chart11.draw(data11, options11);
+        
+        
+        
+        
       }
       
- function updateControlCandidates11(a) {
+      //
+      
+ function updateControlCandidates11(a,b) {
       	
       	console.debug("a iss")
       	console.debug(a)
@@ -43,7 +54,7 @@
       	// this is the keyword
       	console.debug(val)
       	
-		getKey(val, "twitter");	
+		getKey(val, "twitter",b);	
 	}
 	
 function getSelected() {
@@ -56,12 +67,10 @@ function getSelected() {
 	
 	  
 	  
-	 $(document).ready(function() {
-  		updateControlCandidates11();
-	});
 
 
-getKey = function(val, source) {
+
+getKey = function(val, source,b) {
   var url;
   url = void 0;
   url = "/articles/get_mentions";
@@ -73,11 +82,18 @@ getKey = function(val, source) {
     	data5[i][0]= new Date(data5[i][0])
     }
     dataReceived=data5;
-    drawChart11();
+    if (b == true)
+    	return
+    else
+    	drawChart11();
+    
      
   });
 };
 
+	$(document).ready(function() {
+  		updateControlCandidates11();
+	});
 
     </script>
 <div>

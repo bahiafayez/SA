@@ -91,10 +91,6 @@
 		      });
 		};
 
- $(document).ready(function() {
-  		getKey(<%= @val %>, "<%= @src %>");
-	});
-
 
 getKey = function(val, source, stat) {
   var url;
@@ -113,6 +109,10 @@ getKey = function(val, source, stat) {
   });
 };
 
+
+ $(document).ready(function() {
+  		getKey(<%= @val %>, "<%= @src %>");
+});
 
     </script>
 <div>
