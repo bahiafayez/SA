@@ -1,0 +1,136 @@
+<STYLE type="text/css">
+   label {display:inline}
+   input {display: inline}
+ </STYLE>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      //google.setOnLoadCallback(drawChart);
+
+	 var dataReceived, chart11, data11, options11, message
+	 	dataReceived=[];
+	 	
+     google.setOnLoadCallback(drawChart11);
+      function drawChart11() {
+      	
+      	data11 = new google.visualization.DataTable();
+        data11.addColumn('datetime','Date');
+        data11.addColumn('number', '<%= @target %>')
+      
+        data11.addRows(dataReceived)
+ 
+         options11 = {
+          title: "<%= @src %>",
+          //'width':500, 'height':400
+        };
+
+        chart11 = new google.visualization.LineChart(document.getElementById('chart_div11'));
+        
+         function selectHandler() {
+	 	
+          var selection = chart11.getSelection();  // what if view.. google.. then osman.
+          message =""
+          
+          for (var i = 0; i < selection.length; i++) {
+		    var item = selection[i];
+		    if (item.row != null && item.column != null) {
+		     getText(<%= @val %>, data11.getValue(item.row, 0), "<%= @src %>")
+		      message += data11.getColumnLabel(item.column) + ' : ' + data11.getValue(item.row, item.column) + ',date: ' + data11.getValue(item.row, 0);  
+		    } else if (item.row != null) {
+		      message += '{row:' + item.row + '}';
+		    } else if (item.column != null) {
+		      message += data11.getColumnLabel(item.column);
+		    }
+		  }
+		  if (message == '') {
+		    message = 'nothing';
+		    return;
+		  }
+		  //alert('You selected ' + item.row + " " + item.column);
+		  charttype=document.getElementById('stat').value
+		  
+		  
+		  $('#here').text(message)
+		          
+        }
+	 
+
+        google.visualization.events.addListener(chart11, 'select', selectHandler);    
+
+        
+        chart11.draw(data11, options11);
+      }
+      
+
+		getText = function(keyword, date, stat) {
+		  var url;
+		  url = void 0;
+		  url = "/articles/get_text";
+		  $.getJSON(url,{keyword:keyword, date:date, stat:stat} ,function(data5) {
+		    console.log(data5);
+		    message=""
+		    for(var i=0; i<data5.length; i++)
+		    {
+		    	message=message+"<p>"+i+" -- "+data5[i]+"</p><br/>"
+		    	//document.getElementById('here').innerHTML += data5[i];
+		    }
+		    
+		    document.getElementById('here').innerHTML =message;
+		     //$('#here').text(message)
+		  	 
+		      });
+		};
+
+ $(document).ready(function() {
+  		getKey(<%= @val %>, "<%= @src %>");
+	});
+
+
+getKey = function(val, source) {
+  var url;
+  url = void 0;
+  url = "/articles/get_mentions";
+  return $.getJSON(url,{val:val, src:source} ,function(data5) {
+    //console.log(data5);
+    for(var i=0; i<data5.length; i++)
+    {
+    	//console.debug(data5[i][0])
+    	data5[i][0]= new Date(data5[i][0])
+    }
+    dataReceived=data5;
+    drawChart11();
+     
+  });
+};
+
+
+    </script>
+<div>
+	
+	<center><div id="candidate_chooser2">
+					<%= select_tag 'stat', options_for_select(["per hour", "per day"]) , :onchange =>"updatestat"%>
+					
+	</div></center>
+			
+<div class="span6">
+			<div id="chart_div11" style="width:100%; height:500px"></div>
+</div>
+<div class="span5" style="float: left">
+		<br /><br />
+		<div class="well sidebar-nav" style="height:500px;overflow:auto;">
+			<h3>Text</h3><br>
+			<div id="here">
+         
+			</div>
+
+		</div>
+</div>
+
+	
+</div>
+

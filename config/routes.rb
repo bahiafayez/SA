@@ -1,5 +1,7 @@
 SA::Application.routes.draw do
 
+  #resources :targets
+
   #resources :synonyms
 
   #resources :keywords
@@ -10,6 +12,8 @@ SA::Application.routes.draw do
 
   get "charts/index"
   match "/charts/sentiment" => "charts#sentiment"
+  match "/charts/allcharts" => "charts#allcharts"
+  match "/charts/mentions" => "charts#mentions"
 
   match "/articles/get_count" => "articles#get_count"
   match "/articles/get_mentions" => "articles#get_mentions"

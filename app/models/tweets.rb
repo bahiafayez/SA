@@ -87,17 +87,9 @@ class Tweets < ActiveRecord::Base
 		s=Source.find_by_name("Twitter")
 		
 		
-		if Article.find_by_id_str(k).nil? #article not stored
-		  #url??
-		  a= Article.create(:id_str => k, :body => v, :source_id=> s.id, :date=> v2)
-		else #article stored 
-		  a = Article.find_by_id_str(k)
-		  print "HEEREEEEEEEEEEEEEEEEEEEEEEEEEE and k is #{k} and article id is #{a.id}"
+		if Article.where(:id_str=>k, :target_id => @kid).empty?
+		  a= Article.create(:id_str => k, :body => v, :source_id=> s.id, :date=> v2, :target_id => @kid)
 		end
-		  kk=Keyword.find(@kid)
-		  if !a.keywords.include?(kk)
-		    a.article_keywords.create(:keyword_id => @kid, :score=>1)
-		   end
 		
 		map_tweets[k.to_i] = [v2,v]
 	end

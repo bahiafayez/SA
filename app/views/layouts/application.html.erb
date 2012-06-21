@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,7 +22,7 @@
 
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container">
+        <div class="container-fluid">
           <a class="btn btn-navbar" data-target=".nav-collapse" data-toggle="collapse">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -35,15 +35,16 @@
               
               <li><%= link_to "Mentions",  charts_index_path %></li>
               <li><%= link_to "Sentiments",  charts_sentiment_path %></li>
+              <li><%= link_to "All Charts",  charts_allcharts_path %></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
       </div>
     </div>
 
-    <div class="container">
+    <div class="container-fluid">
       <div class="content">
-        <div class="row">
+        <div class="row-fluid">
            <div class="span12">
               <%= yield %>
             </div>
@@ -56,7 +57,7 @@
       </div><!--/content-->
 
       <footer>
-        <p>&copy; Akhbarak 2012</p>
+        <p>&copy; اخبارك ٢٠١٢</p>
       </footer>
 
     </div> <!-- /container -->
@@ -64,7 +65,7 @@
     <!-- Javascripts
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <%= javascript_include_tag "application" %>
+    
 
   </body>
 </html>

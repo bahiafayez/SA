@@ -118,10 +118,19 @@ class ArticlesController < ApplicationController
         #Article.where(:source_id => s.id)
         #Article.joins(:keywords).where('keywords.name'=> "Morsi").count
         count=[]
-        @a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> "Morsi").count(group: :date)
-        @a.each do |a|
-          count<< [a[0],0,0,0,0,a[1]]
+        #@a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> "Morsi").count(group: :date)
+        @a= Article.where(:source_id=>s.id, :target_id=> params[:val])#.count(group: :date)
+        gg=0
+        @a.group_by(&:hour).sort.each do |hour, posts|
+          print "Here"
+          gg=gg+posts.count
+          print "#{hour} : #{posts.count}"
+          count<<[hour,posts.count]
         end
+        print "gg issss #{gg}"
+        # @a.each do |a|
+          # count<< [a[0],0,0,0,0,a[1]]
+        # end
     end
     render json: count
  end
@@ -131,14 +140,28 @@ class ArticlesController < ApplicationController
     date=params[:date]
     stat=params[:stat]
     
-    checkdate= Time.zone.parse(date).utc.to_formatted_s(:db)
-    print "checkdate issss"
-    print checkdate
+    
+    date2= 1.minutes.since date.to_datetime
+    date3=date.to_datetime
+    print date2
+    print date3
+    checkdate= Time.parse(date).to_formatted_s(:db)
+    print "over hereeeeee"
+    a= 1.minutes.since Time.parse(date)
+    checkdate2=a.to_formatted_s(:db)
+    # checkdate2= Time.zone.parse(date2).utc.to_formatted_s(:db)
+    # print "checkdate issss"
+     print checkdate
+    # print checkdate
     
     s=Source.find(:first, :conditions => [ "lower(name) = ?", stat.downcase ])
     
         text=[]
-        @a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> keyword, 'articles.date'=>checkdate)
+        #@a=Article.where(:date > date , :source_id=> s.id, :target_id=> 1)
+        #@a =Article.find(:all, :conditions =>["date(date) BETWEEN ? AND ? ", date2, date3])
+        @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? ", checkdate, checkdate2, s.id, keyword])
+
+        #@a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> keyword, 'articles.date'=>checkdate)
         @a.each do |a|
           text<< a.body
         end

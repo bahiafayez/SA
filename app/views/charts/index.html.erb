@@ -93,7 +93,7 @@
         data_array['comments'].addRows(d2)
         
         data_array['twitter'] = new google.visualization.DataTable();
-        data_array['twitter'].addColumn('date','Date');
+        data_array['twitter'].addColumn('datetime','Date');
         data_array['twitter'].addColumn('number', 'Muslim Brotherhood')
         data_array['twitter'].addColumn('number', 'EFG Hermes')
         data_array['twitter'].addColumn('number', 'SCAF')
@@ -147,6 +147,7 @@
 		  }
 		  if (message == '') {
 		    message = 'nothing';
+		    return;
 		  }
 		  //alert('You selected ' + item.row + " " + item.column);
 		  var radioObj = document.getElementsByName("stat");
@@ -259,6 +260,9 @@ getFirstChart = function() {
     	//console.debug(data5[i][0])
     	data5[i][0]= new Date(data5[i][0])
     }
+    console.debug("New date is ")
+    console.debug(data5[0][0])
+    console.debug(data5[0][5])
     d3=data5;
     drawChart();
     //chart.draw()
@@ -271,8 +275,16 @@ getText = function(keyword, date, stat) {
   url = "/articles/get_text";
   $.getJSON(url,{keyword:keyword, date:date, stat:stat} ,function(data5) {
     console.log(data5);
+    message=""
+    for(var i=0; i<data5.length; i++)
+    {
+    	message=message+"<p>"+i+" -- "+data5[i]+"</p><br/>"
+    	//document.getElementById('here').innerHTML += data5[i];
+    }
     
-  
+    document.getElementById('here').innerHTML =message;
+     //$('#here').text(message)
+  	 
       });
 };
       
@@ -334,32 +346,7 @@ getText = function(keyword, date, stat) {
                   <li><%= link_to "Link2", "/path2"  %></li>
                   <li><%= link_to "Link3", "/path3"  %></li>
                 </ul> -->
-                Text here Form helpers are designed to make working with resources much easier compared to using vanilla HTML.
-
-Forms for models are created with form_for. That method yields a form builder that knows the model the form is about. The form builder is thus able to generate default values for input fields that correspond to model attributes, and also convenient names, IDs, endpoints, etc.
-
-Conventions in the generated field names allow controllers to receive form data nicely structured in params with no effort on your side.
-When the object belonging to the current scope has a nested attribute writer for a certain attribute, #fields_for will yield a new scope for that attribute. This allows you to create forms that set or change the attributes of a parent object and its associations in one go.
-
-Nested attribute writers are normal setter methods named after an association. The most common way of defining these writers is either with accepts_nested_attributes_for in a model definition or by defining a method with the proper name. For example: the attribute writer for the association :address is called address_attributes=.
-
-Whether a one-to-one or one-to-many style form builder will be yielded depends on whether the normal reader method returns a single object or an array of objects.
-Returns a file upload input tag tailored for accessing a specified attribute (identified by method) on an object assigned to the template (identified by object). Additional options on the input tag can be passed as a hash with options. These options will be tagged onto the HTML as an HTML element attribute as in the example shown.
-
-Using this method inside a form_for block will set the enclosing form’s encoding to multipart/form-data.
-Text here Form helpers are designed to make working with resources much easier compared to using vanilla HTML.
-
-Forms for models are created with form_for. That method yields a form builder that knows the model the form is about. The form builder is thus able to generate default values for input fields that correspond to model attributes, and also convenient names, IDs, endpoints, etc.
-
-Conventions in the generated field names allow controllers to receive form data nicely structured in params with no effort on your side.
-When the object belonging to the current scope has a nested attribute writer for a certain attribute, #fields_for will yield a new scope for that attribute. This allows you to create forms that set or change the attributes of a parent object and its associations in one go.
-
-Nested attribute writers are normal setter methods named after an association. The most common way of defining these writers is either with accepts_nested_attributes_for in a model definition or by defining a method with the proper name. For example: the attribute writer for the association :address is called address_attributes=.
-
-Whether a one-to-one or one-to-many style form builder will be yielded depends on whether the normal reader method returns a single object or an array of objects.
-Returns a file upload input tag tailored for accessing a specified attribute (identified by method) on an object assigned to the template (identified by object). Additional options on the input tag can be passed as a hash with options. These options will be tagged onto the HTML as an HTML element attribute as in the example shown.
-
-Using this method inside a form_for block will set the enclosing form’s encoding to multipart/form-data.
+                
 </div>
 
 </div>

@@ -5,21 +5,30 @@ class Article < ActiveRecord::Base
   belongs_to :source
   has_many :comments, :dependent => :destroy, :order => "id ASC"
   
-  has_many :article_keywords
-  has_many :keywords, :through => :article_keywords, :dependent => :destroy
+  belongs_to :target
   
+  def hour
+    self.date.strftime('%d %B, %Y %H:%M')
+  end
+  
+  
+  def self.getTweets2()
+    Target.all.each do |t|
+      getTweets(t.id)
+    end
+  end
   
   def self.getTweets(keyword_id)
-    keyword=Keyword.find(keyword_id.to_i)
+    keyword=Target.find(keyword_id.to_i)
     print "keyword id issssss"
     puts keyword
-    synonyms= Synonym.where(:keyword_id => keyword_id)
-    search=[]
-    synonyms.each do |s|
-      search<<"\"#{s.name}\""
-    end
-    search=search.join(" OR ")
-    search=URI::encode(search)
+    #synonyms= Synonym.where(:keyword_id => keyword_id)
+    #search=[]
+    #synonyms.each do |s|
+    #  search<<"\"#{s.name}\""
+    #end
+    #search=search.join(" OR ")
+    search=URI::encode(keyword.query)
     print search
     #search= keyword.name  #later get synonyms
     
@@ -41,5 +50,7 @@ class Article < ActiveRecord::Base
     # end
     
     #Still max is 1500!
+    #sleep(1800)
+    #getTweets(keyword_id)
   end
 end

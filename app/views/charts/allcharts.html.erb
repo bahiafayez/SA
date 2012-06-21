@@ -1,0 +1,96 @@
+<STYLE type="text/css">
+   label {display:inline}
+   input {display: inline}
+ </STYLE>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      //google.setOnLoadCallback(drawChart);
+
+	 var dataReceived, chart11, data11, options11
+	 	dataReceived=[];
+	 	
+     google.setOnLoadCallback(drawChart11);
+      function drawChart11() {
+      	
+      	data11 = new google.visualization.DataTable();
+        data11.addColumn('datetime','Date');
+        data11.addColumn('number', 'Mentions')
+      
+        data11.addRows(dataReceived)
+ 
+         options11 = {
+          title: 'Twitter',
+          'width':500, 'height':200
+        };
+
+        chart11 = new google.visualization.LineChart(document.getElementById('chart_div11'));
+        
+        chart11.draw(data11, options11);
+      }
+      
+ function updateControlCandidates11(a) {
+      	
+      	console.debug("a iss")
+      	console.debug(a)
+      	a=document.getElementById('keywords')
+      	val=a.options[a.selectedIndex].value
+      	// this is the keyword
+      	console.debug(val)
+      	
+		getKey(val, "twitter");	
+	}
+	
+function getSelected() {
+      	
+
+      	a=document.getElementById('keywords');
+      	val=a.options[a.selectedIndex].value;
+		return val;
+	}
+	
+	  
+	  
+	 $(document).ready(function() {
+  		updateControlCandidates11();
+	});
+
+
+getKey = function(val, source) {
+  var url;
+  url = void 0;
+  url = "/articles/get_mentions";
+  return $.getJSON(url,{val:val, src:source} ,function(data5) {
+    //console.log(data5);
+    for(var i=0; i<data5.length; i++)
+    {
+    	//console.debug(data5[i][0])
+    	data5[i][0]= new Date(data5[i][0])
+    }
+    dataReceived=data5;
+    drawChart11();
+     
+  });
+};
+
+
+    </script>
+<div>
+	<%= form_tag charts_mentions_path do %>
+	<center><div id="candidate_chooser2">
+					<%= select_tag 'keywords', options_from_collection_for_select(Target.all, :id, :name) , :onchange =>"updateControlCandidates11(this)"%>
+					<%= hidden_field_tag "src", "twitter" %>		
+	</div></center>
+			
+<div class="span4">
+			<div id="chart_div11" ></div>
+			<center><%= submit_tag "Detailed View" %></center>
+</div>
+	<% end %>
+</div>
+

@@ -8,6 +8,7 @@ class CreateArticles < ActiveRecord::Migration
       t.string :title
       t.text :body
       t.string :metadata
+      t.integer :target_id
 
       t.timestamps
     end

@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Query:</b>
+  <%= @target.query %>
+</p>
+
+<p>
+  <b>Max id twitter:</b>
+  <%= @target.max_id_twitter %>
+</p>
+
+
+<%= link_to 'Edit', edit_target_path(@target) %> |
+<%= link_to 'Back', targets_path %>
