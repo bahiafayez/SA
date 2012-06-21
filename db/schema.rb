@@ -46,14 +46,6 @@ ActiveRecord::Schema.define(:version => 20120620200517) do
   add_index "admin_users", ["email"], :name => "index_admin_users_on_email", :unique => true
   add_index "admin_users", ["reset_password_token"], :name => "index_admin_users_on_reset_password_token", :unique => true
 
-  create_table "article_keywords", :force => true do |t|
-    t.integer  "keyword_id"
-    t.integer  "article_id"
-    t.integer  "score"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
   create_table "articles", :force => true do |t|
     t.integer  "source_id"
     t.string   "id_str"
@@ -72,13 +64,6 @@ ActiveRecord::Schema.define(:version => 20120620200517) do
     t.text     "comment"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
-  end
-
-  create_table "keywords", :force => true do |t|
-    t.string   "name"
-    t.string   "max_id_twitter"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
   end
 
   create_table "sources", :force => true do |t|
