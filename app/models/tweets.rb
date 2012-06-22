@@ -77,8 +77,12 @@ class Tweets < ActiveRecord::Base
   
   
   def MapTweets(results)
+    
+    uri = URI.parse("http://omp.sameh.webfactional.com/tagging")
+      #print "uri is #{uri}"
+    
     map_tweets={}
-	results.each do |r|
+	  results.each do |r|
 		k= r['id_str']
 		@stopped=k
 		v= r['text']
@@ -86,9 +90,12 @@ class Tweets < ActiveRecord::Base
 		# Store here directly
 		s=Source.find_by_name("Twitter")
 		
-		
+		conn = Net::HTTP.post_form(uri, "text"=> v )
+    resp= conn.body
+    resp = ActiveSupport::JSON.decode(resp)
+    
 		if Article.where(:id_str=>k, :target_id => @kid).empty?
-		  a= Article.create(:id_str => k, :body => v, :source_id=> s.id, :date=> v2, :target_id => @kid)
+		  a= Article.create(:id_str => k, :body => v, :source_id=> s.id, :date=> v2, :target_id => @kid, :polarity => resp[2], :coloured_text => resp[0])
 		end
 		
 		map_tweets[k.to_i] = [v2,v]

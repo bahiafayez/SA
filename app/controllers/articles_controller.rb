@@ -81,17 +81,68 @@ class ArticlesController < ApplicationController
     end
   end
   
+  def getSelected
+    @status=params[:val]
+    session[:status]=params[:val]
+    render json: @status
+  end
+  
   def get_count
     val=params[:val]
     source=params[:src]
     #all={'value'=> val, 'source'=> source}
     
-     count=  [
-          ['2012-03-15', Random.rand(500),Random.rand(500),Random.rand(500)],
-          ['2012-03-16', Random.rand(500),Random.rand(500),Random.rand(500)],
-          ['2012-03-17', Random.rand(500),Random.rand(500),Random.rand(500)],
-          ['2012-03-18', Random.rand(500),Random.rand(500),Random.rand(500)]
-        ]
+    s=Source.find(:first, :conditions => [ "lower(name) = ?", source.downcase ])
+        #Article.where(:source_id => s.id)
+        #Article.joins(:keywords).where('keywords.name'=> "Morsi").count
+        count=[]
+        #@a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> "Morsi").count(group: :date)
+        @a= Article.where(:source_id=>s.id, :target_id=> params[:val])#.count(group: :date)
+        #@positive=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity > 0", s.id, keyword])
+        #@neutral=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity = 0", s.id, keyword])
+        #@negative=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity < 0", s.id, keyword])
+        gg=0
+        
+        if params[:stat]=="per day"
+          @a.group_by(&:day).sort.each do |hour, posts|
+          print "Here"
+          gg=gg+posts.count
+          print "#{hour} : #{posts.count}"
+          next_day=1.days.since Time.parse(hour)
+          
+          checkdate= Time.parse(hour).to_formatted_s(:db)
+          checkdate2=next_day.to_formatted_s(:db)
+          
+          @positive=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity > 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
+          @neutral=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity = 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
+          @negative=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity < 0 and date BETWEEN ? AND ? ", s.id, val, checkdate,  checkdate2])
+          
+          count<<[hour,@negative.count, @neutral.count, @positive.count]
+          end
+        else
+          @a.group_by(&:hour).sort.each do |hour, posts|
+          print "Here"
+          gg=gg+posts.count
+          print "#{hour} : #{posts.count}"
+          next_hour=1.hours.since Time.parse(hour)
+          
+          checkdate= Time.parse(hour).to_formatted_s(:db)
+          checkdate2=next_hour.to_formatted_s(:db)
+          
+          @positive=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity > 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
+          @neutral=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity = 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
+          @negative=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity < 0 and date BETWEEN ? AND ? ", s.id, val, checkdate,  checkdate2])
+          
+          count<<[hour, @negative.count, @neutral.count,@positive.count]
+          end
+        end
+    
+     # count=  [
+          # ['2012-03-15', Random.rand(500),Random.rand(500),Random.rand(500)],
+          # ['2012-03-16', Random.rand(500),Random.rand(500),Random.rand(500)],
+          # ['2012-03-17', Random.rand(500),Random.rand(500),Random.rand(500)],
+          # ['2012-03-18', Random.rand(500),Random.rand(500),Random.rand(500)]
+        # ]
     render json: count
   end
   
@@ -183,11 +234,26 @@ class ArticlesController < ApplicationController
         text=[]
         #@a=Article.where(:date > date , :source_id=> s.id, :target_id=> 1)
         #@a =Article.find(:all, :conditions =>["date(date) BETWEEN ? AND ? ", date2, date3])
-        @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? ", checkdate, checkdate2, s.id, keyword])
+        if params[:sent]=="Positive"
+          @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? and polarity>0", checkdate, checkdate2, s.id, keyword])
+        elsif params[:sent]=="Neutral"
+          @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? and polarity=0", checkdate, checkdate2, s.id, keyword])
+        elsif params[:sent]=="Negative"
+          @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? and polarity<0", checkdate, checkdate2, s.id, keyword])
+        else
+          @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? ", checkdate, checkdate2, s.id, keyword])
+        end
+        
 
         #@a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> keyword, 'articles.date'=>checkdate)
-        @a.each do |a|
-          text<< a.body
+        if params[:sent]
+          @a.each do |a|
+            text<< a.coloured_text
+          end
+        else
+          @a.each do |a|
+            text<< a.body
+          end
         end
     
     render json: text

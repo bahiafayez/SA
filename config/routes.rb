@@ -14,10 +14,14 @@ SA::Application.routes.draw do
   match "/charts/sentiment" => "charts#sentiment"
   match "/charts/allcharts" => "charts#allcharts"
   match "/charts/mentions" => "charts#mentions"
+  match "/charts/sentiments" => "charts#sentiments"
+  match "/charts/check" => "charts#check"
+  
 
   match "/articles/get_count" => "articles#get_count"
   match "/articles/get_mentions" => "articles#get_mentions"
   match "/articles/get_text" => "articles#get_text"
+  match "/articles/getSelected" => "articles#getSelected"
   #get "home/index"
 
   #resources :comments
