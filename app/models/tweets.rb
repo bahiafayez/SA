@@ -90,11 +90,12 @@ class Tweets < ActiveRecord::Base
 		# Store here directly
 		s=Source.find_by_name("Twitter")
 		
-		conn = Net::HTTP.post_form(uri, "text"=> v )
-    resp= conn.body
-    resp = ActiveSupport::JSON.decode(resp)
+		
     
 		if Article.where(:id_str=>k, :target_id => @kid).empty?
+		  conn = Net::HTTP.post_form(uri, "text"=> v )
+      resp= conn.body
+      resp = ActiveSupport::JSON.decode(resp)
 		  a= Article.create(:id_str => k, :body => v, :source_id=> s.id, :date=> v2, :target_id => @kid, :polarity => resp[2], :coloured_text => resp[0])
 		end
 		
