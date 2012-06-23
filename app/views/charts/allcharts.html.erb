@@ -143,13 +143,22 @@ getKey22 = function(val, source) {
   });
 };
 
+	updateAll = function(a)
+	{
+		updateControlCandidates11(a);
+		updateControlCandidates22(a);
+	}
+
+
 	$(document).ready(function() {
-  		updateControlCandidates11();
-  		updateControlCandidates22();
+  		//updateControlCandidates11();
+  		//updateControlCandidates22();
+  		updateAll();
   		
   
 	});
-
+	
+	
 // $(function($) {
     // $("#link").click(function() {
         // $.ajax({url: '<%= url_for :action => 'sentiments' %>',
@@ -163,7 +172,7 @@ getKey22 = function(val, source) {
 <div>
 	<%= form_tag charts_check_path do %>
 	<center><div id="candidate_chooser2">
-					<%= select_tag 'keywords', options_from_collection_for_select(Target.all, :id, :name) , :onchange =>"updateControlCandidates11(this)"%>
+					<%= select_tag 'keywords', options_from_collection_for_select(Target.all, :id, :name) , :onchange =>"updateAll(this)"%>
 							
 	</div></center>
 <div class="span12">			
