@@ -12,9 +12,10 @@
       // Set a callback to run when the Google Visualization API is loaded.
       //google.setOnLoadCallback(drawChart);
 
-	 var dataReceived, chart11, data11, options11, data22, chart22, options22, dataReceived22
+	 var dataReceived, chart11, data11, options11, data22, chart22, options22, dataReceived22, data33, chart33, options33, dataReceived33
 	 	dataReceived=[];
-	 	dataReceived22=[]
+	 	dataReceived22=[];
+	 	dataReceived33=[];
 	 	
      google.setOnLoadCallback(drawChart11);
       function drawChart11() {
@@ -143,10 +144,72 @@ getKey22 = function(val, source) {
   });
 };
 
+///////// Third Chart /////////////////////
+
+ google.setOnLoadCallback(drawChart33);
+      function drawChart33() {
+      	
+      	data33 = new google.visualization.DataTable();
+        data33.addColumn('datetime','Date');
+        data33.addColumn('number', 'Mentions')
+      
+      	
+        data33.addRows(dataReceived33)
+ 
+         options33 = {
+          title: 'Articles',
+          'width':500, 'height':200
+        };
+
+        chart33 = new google.visualization.LineChart(document.getElementById('chart_div33'));
+        
+        chart33.draw(data33, options33);
+        
+      }
+
+      //
+      
+ function updateControlCandidates33(a,b) {
+      	
+      	console.debug("a iss")
+      	console.debug(a)
+      	a=document.getElementById('keywords')
+      	val=a.options[a.selectedIndex].value
+      	// this is the keyword
+      	console.debug(val)
+      	//getSelected();
+		getKey33(val, "articles",b);	
+	}
+	
+getKey33 = function(val, source,b) {
+  var url;
+  url = void 0;
+  url = "/articles/get_mentions";
+  return $.getJSON(url,{val:val, src:source} ,function(data5) {
+    //console.log(data5);
+    for(var i=0; i<data5.length; i++)
+    {
+    	//console.debug(data5[i][0])
+    	data5[i][0]= new Date(data5[i][0])
+    }
+    dataReceived=data5;
+    if (b == true)
+    	return
+    else
+    	drawChart33();
+    
+     
+  });
+};
+
+//////////////////////////////////////////
+
+
 	updateAll = function(a)
 	{
 		updateControlCandidates11(a);
 		updateControlCandidates22(a);
+		updateControlCandidates33(a);
 	}
 
 
@@ -187,6 +250,11 @@ getKey22 = function(val, source) {
 <div class="span4">
 			<div id="chart_div11" ></div>
 			<center><%= submit_tag "Detailed View" , :name => "twitter_mentions" %></center>
+			
+</div>
+<div class="span4">
+			<div id="chart_div33" ></div>
+			<center><%= submit_tag "Detailed View" , :name => "article_mentions" %></center>
 			
 </div>
 </div>

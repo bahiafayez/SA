@@ -151,21 +151,17 @@ class ArticlesController < ApplicationController
     y = Date.new(2012, 3, 15)
     z = Date.new(2012, 3, 16)
     if source=="articles"
-      count=[
-          [y, 111,22,234,111,33],
-          [z, 11,242,34,119,3]
-        ]
+      s=Source.find_by_name("Articles")
     elsif source=="comments"
-      count= [
-          [y, 1,2,3,4,33],
-          [z, 11,242,4,119,3]
-        ]
+      s=Source.find_by_name("Comments")
+
     else
       # count= [
           # [y, 55,22,54,111,89],
           # [z, 11,34,34,77,3]
         # ]
         s=Source.find_by_name("Twitter")
+    end
         #Article.where(:source_id => s.id)
         #Article.joins(:keywords).where('keywords.name'=> "Morsi").count
         count=[]
@@ -201,7 +197,7 @@ class ArticlesController < ApplicationController
         # @a.each do |a|
           # count<< [a[0],0,0,0,0,a[1]]
         # end
-    end
+    
     render json: count
  end
 
