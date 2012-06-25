@@ -35,14 +35,6 @@ class ChartsController < ApplicationController
     @val=params[:val]
     @src=params[:src]
     
-    # params.each do |p|
-      # if p[1]=="Detailed View"
-        # print "hereeee key isss #{p[0]}"
-        # @both=p[0].split("_")
-        # @src=@both[0]
-        # @type=@both[1]
-      # end
-    # end
     
     @target=Target.find(@val)
     @target=@target.name

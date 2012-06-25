@@ -7,11 +7,11 @@
 #
 # set :output, "/path/to/my/cron_log.log"
 #
-# every 30.minutes do
+#every 1.hours do
 #   command "/usr/bin/some_great_command"
-#   runner "Article.getTweets2()"
+#   runner "Article.getTweets(4)"
 #   rake "some:great:rake:task"
-# end
+#end
 #
 # every 4.days do
 #   runner "AnotherModel.prune_old_records"

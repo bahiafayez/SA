@@ -82,16 +82,10 @@ class Article < ActiveRecord::Base
     print search
     
     #tosearch= "www.akhbarak.net/api_v2/articles/search/#{search}/page/2/per_page/100.json"
-    tosearch = "http://www.akhbarak.net/api_v2/advanced_search/body/#{search}/from/2/per_page/10"
-    uri = URI.parse(tosearch)
-    print "uri is #{uri}"
-    conn = Net::HTTP.get_response(uri)
-    resp= conn.body
-    resp = ActiveSupport::JSON.decode(resp)
-    print resp
+    #tosearch = "http://www.akhbarak.net/api_v2/advanced_search/body/#{search}/from/2/per_page/10"
     
-    #p=Akhbarak.new()
-    #p.getArticles()
+    p=Akhbarak.new()
+    p.getArticles(keyword_id, search)
     
     
     # max_id= keyword.max_id_twitter

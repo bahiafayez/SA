@@ -12,10 +12,11 @@
       // Set a callback to run when the Google Visualization API is loaded.
       //google.setOnLoadCallback(drawChart);
 
-	 var dataReceived, chart11, data11, options11, data22, chart22, options22, dataReceived22, data33, chart33, options33, dataReceived33
+	 var dataReceived, chart11, data11, options11, data22, chart22, options22, dataReceived22, data33, chart33, options33, dataReceived33, data44, chart44, options44, dataReceived44
 	 	dataReceived=[];
 	 	dataReceived22=[];
 	 	dataReceived33=[];
+	 	dataReceived44=[];
 	 	
      google.setOnLoadCallback(drawChart11);
       function drawChart11() {
@@ -192,12 +193,70 @@ getKey33 = function(val, source,b) {
     	//console.debug(data5[i][0])
     	data5[i][0]= new Date(data5[i][0])
     }
-    dataReceived=data5;
+    dataReceived33=data5;
     if (b == true)
     	return
     else
     	drawChart33();
     
+     
+  });
+};
+
+///////// Fourth Chart /////////////////////
+
+ google.setOnLoadCallback(drawChart44);
+      function drawChart44() {
+      	
+      	data44 = new google.visualization.DataTable();
+        data44.addColumn('string','Date');
+        data44.addColumn('number', 'Negative')
+        data44.addColumn('number', 'Neutral')
+        data44.addColumn('number', 'Positive')
+       
+        
+        
+        data44.addRows(dataReceived44)
+        
+        
+
+         options44 = {
+          //title: 'Company Performance',
+          //hAxis: {title: 'Year', titleTextStyle: {color: 'red'}},
+          isStacked: true,
+     	 'width':500, 'height':200,
+          colors: ['red','yellow','#00AA11']
+        };
+
+        chart44 = new google.visualization.ColumnChart(document.getElementById('chart_div44'));
+        
+        chart44.draw(data44, options44);
+      }
+      
+ function updateControlCandidates44(a) {
+      	
+      	
+      	a=document.getElementById('keywords')
+      	val=a.options[a.selectedIndex].value
+      	// this is the keyword
+      	console.debug(val)
+      	
+		getKey44(val, "articles");
+		
+		//chart.draw(data,options);
+	}
+	  
+
+
+getKey44 = function(val, source) {
+  var url;
+  url = void 0;
+  url = "/articles/get_count";
+  return $.getJSON(url,{val:val, src:source} ,function(data5) {
+    console.log(data5);
+    
+    dataReceived44=data5;
+    drawChart44();
      
   });
 };
@@ -210,6 +269,7 @@ getKey33 = function(val, source,b) {
 		updateControlCandidates11(a);
 		updateControlCandidates22(a);
 		updateControlCandidates33(a);
+		updateControlCandidates44(a);
 	}
 
 
@@ -245,6 +305,12 @@ getKey33 = function(val, source,b) {
 			
 			
 </div>
+<div class="span4">
+			<div id="chart_div44" ></div>
+			<center><%= submit_tag "Detailed View", :name => "articles_sentiments" %></center>
+			
+			
+</div>
 </div>
 <div class="span12">
 <div class="span4">
@@ -254,7 +320,7 @@ getKey33 = function(val, source,b) {
 </div>
 <div class="span4">
 			<div id="chart_div33" ></div>
-			<center><%= submit_tag "Detailed View" , :name => "article_mentions" %></center>
+			<center><%= submit_tag "Detailed View" , :name => "articles_mentions" %></center>
 			
 </div>
 </div>

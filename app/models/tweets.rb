@@ -52,12 +52,15 @@ class Tweets < ActiveRecord::Base
 	puts "-------------------------------------------"
 	#resp = ActiveSupport::JSON.decode resp
 	i=1
-	while resp.has_key?("error") and (resp['error'] == 'Invalid query' or resp['error'] == 'You have been rate limited. Enhance your calm.') do
+	#make sure its working..
+	if !resp.nil? and !resp.empty? # or put in loop? kda because might now be any data in the last hour.. wala ehCHECK!!
+	while (resp.has_key?("error") and (resp['error'] == 'Invalid query' or resp['error'] == 'You have been rate limited. Enhance your calm.')) do
 		print "Try #{i}, Err: #{resp['error']} " 
 		sleep(5)
 		i=i+1
 		resp = roundGetResponse(url)
 		#resp = ActiveSupport::JSON.decode resp
+	end
 	end
 	
 	if !resp.nil? and resp.has_key?("results")
@@ -89,15 +92,23 @@ class Tweets < ActiveRecord::Base
 		v2= r['created_at']
 		# Store here directly
 		s=Source.find_by_name("Twitter")
-		
+		tries=0
 		
     
 		if Article.where(:id_str=>k, :target_id => @kid).empty?
-		  conn = Net::HTTP.post_form(uri, "text"=> v )
-      resp= conn.body
-      resp = ActiveSupport::JSON.decode(resp)
-		  a= Article.create(:id_str => k, :body => v, :source_id=> s.id, :date=> v2, :target_id => @kid, :polarity => resp[2], :coloured_text => resp[0])
-		end
+		  begin
+  		  conn = Net::HTTP.post_form(uri, "text"=> v )
+        resp= conn.body
+        resp = ActiveSupport::JSON.decode(resp)
+  		  a= Article.create(:id_str => k, :body => v, :source_id=> s.id, :date=> v2, :target_id => @kid, :polarity => resp[2], :coloured_text => resp[0])
+		  rescue Exception => e  
+        tries += 1
+        puts "Error: #{e.message}"
+        puts "Trying again!" if tries <= 10
+        retry if tries <= 10
+        puts "No more attempts!"
+  		end
+  	end
 		
 		map_tweets[k.to_i] = [v2,v]
 	end
@@ -126,7 +137,9 @@ class Tweets < ActiveRecord::Base
 	#params.map{|key,value|"#{key}=#{value}"}.join("&")						
 	req_url= 'https://apigee.com/console/-1/testApi'	
 	#while true do
+	tries=0
 		begin
+		 
 			#print "url is #{req_url}"
 			uri = URI.parse(url)
 			#print "uri is #{uri}"
@@ -141,8 +154,15 @@ class Tweets < ActiveRecord::Base
 			#end
 			#print "Retry Request"
 		rescue Exception => e  
-			puts e.message  
-			puts e.backtrace.inspect
+			#puts e.message  
+			#puts e.backtrace.inspect
+			
+			tries += 1
+      puts "Error: #{e.message}"
+      puts "Trying again!" if tries <= 10
+      retry if tries <= 10
+      puts "No more attempts!"
+
 			#puts "Try again"
 			#sleep(10)
 			#roundGetResponse(url)
