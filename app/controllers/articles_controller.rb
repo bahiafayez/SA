@@ -243,12 +243,12 @@ class ArticlesController < ApplicationController
 
         #@a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> keyword, 'articles.date'=>checkdate)
         if params[:sent]
-          @a.each do |a|
-            text<< a.coloured_text
+          @a.each do |l|
+            text<< l.coloured_text
           end
         else
-          @a.each do |a|
-            text<< a.body
+          @a.each do |l|
+            text<< l.body
           end
         end
     
