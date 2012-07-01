@@ -70,7 +70,7 @@ class Article < ActiveRecord::Base
     
     #Still max is 1500!
     #sleep(3600)
-    getTweets(keyword_id)
+    #getTweets(keyword_id)
   end
   
   def self.getAkhbar(keyword_id)

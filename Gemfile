@@ -9,6 +9,7 @@ gem "meta_search",    '>= 1.1.0.pre'
 gem "twitter"
 gem 'whenever', :require => false
 gem 'sass-rails'
+#gem 'libv8', '3.3.10.4'
 # Gems used only for assets and not required
 # in production environments by default.
 #group :assets do
@@ -16,8 +17,9 @@ gem 'sass-rails'
   gem 'coffee-rails', '~> 3.2.1'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  # gem 'therubyracer'
-
+  gem 'therubyracer'
+  gem 'capistrano'
+  gem 'passenger'
   gem 'uglifier', '>= 1.0.3'
   gem 'twitter-bootstrap-rails'
 #end
@@ -30,7 +32,8 @@ group :development, :test do
 end
 
 group :production do
-  gem 'pg'
+  gem 'mysql2'
+  #gem 'pg'
 end
 
 # To use ActiveModel has_secure_password

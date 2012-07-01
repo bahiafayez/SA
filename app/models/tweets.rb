@@ -14,6 +14,9 @@ class Tweets < ActiveRecord::Base
     @map_tweets={}
     @kid=""
     @stopped=0
+    @list=[]
+    @listids=[]
+    @lock = Mutex.new  # For thread safety .. didn't use it.. no shared variables..
   end
 
   def getTweets(kid, hash_tag, id ,stop) #, num_pages #this id to say start from which (since_id...)
@@ -29,7 +32,8 @@ class Tweets < ActiveRecord::Base
     #pp Article.first
   	max_id=''
   	i=1
-  	while url != '' and i<20 do 
+  	next_page="abc"
+  	while next_page != '' and i<17 do 
   		print i, ' - ', url
   		mp, max_id, next_page= getTweets2(url)
   		print "-----------------------------next_page issss #{next_page}"
@@ -41,9 +45,129 @@ class Tweets < ActiveRecord::Base
   		i=i+1
   	end
   	#before returning save the tweets
-  	
+  	analyzeTweets2()
+  	#Now will analyze them!
+  
   	return [max_id, @stopped]
   end
+  def analyzeTweets2()  #Threaded
+    
+    puts "in here"
+    i=0
+    arr=[]
+    while !@list.nil?
+      print "IN HEREEEEEEE"
+      puts "i isss #{i}"
+      puts @list
+      puts @listids
+      a=@list[0,100]
+      b=@listids[0,100]
+      arr<<Thread.new{analyzeTweets(a, b)}
+      @list=@list[100..@list.length]
+      @listids=@listids[100..@listids.length]
+      i=i+1
+      if arr.length==5
+        arr.each {|t| t.join; }
+        arr=[]
+      end
+      
+    end
+    arr.each {|t| t.join; } #in ruby if dont join mainthread won't wait
+    
+  end
+  
+  def analyzeTweets(analyzed, theids)
+    #uri = URI.parse("http://omp.sameh.webfactional.com/taggingList")
+    uri = URI.parse("http://names.alwaysdata.net/taggingList")
+    
+    #while !@list.nil? and !@list.empty? do
+    tries=0
+    to_tag_json = ActiveSupport::JSON.encode(analyzed)
+    post_body = to_tag_json
+    begin
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.read_timeout=3600
+      http.open_timeout=3600
+      request = Net::HTTP::Post.new(uri.request_uri)
+      request.body = post_body
+      response= http.request(request)
+      resp=response.body
+      resp = ActiveSupport::JSON.decode(resp)
+    rescue Exception => e  
+        tries += 1
+        puts "Error: #{e.message}"
+        puts "Trying again analyze!" if tries <= 10
+        retry if tries <= 10
+        puts "No more attempts in analyzing!"  
+    end
+    
+    
+   
+    if !resp.nil? and !resp.empty?         #TRY AGAIN THEN TRY SEQUENTIAL WITH 500 EACH TIME TO MAKE SURE THIS IS BETTER
+      if resp.length != theids.length
+        analyzeTweets(analyzed, theids)
+      else
+        theids.zip(resp).each do |l, a|
+          @lock.synchronize{
+          article=Article.find(l)
+          article.polarity=a[1]
+          article.coloured_text=a[0]
+          article.save
+          }
+        end
+      end
+    end
+    
+    #if !@listids.nil?
+    #  puts "id is #{@listids[0]}"
+    #end
+    puts "this thread finished."
+    
+  end
+  
+  
+  
+  # def analyzeTweets()  #Not Threaded
+    # #uri = URI.parse("http://omp.sameh.webfactional.com/taggingList")
+    # uri = URI.parse("http://names.alwaysdata.net/taggingList")
+#     
+    # while !@list.nil? and !@list.empty? do
+    # tries=0
+    # to_tag_json = ActiveSupport::JSON.encode(@list[0,100])
+    # post_body = to_tag_json
+    # begin
+      # http = Net::HTTP.new(uri.host, uri.port)
+      # http.read_timeout=3600
+      # http.open_timeout=3600
+      # request = Net::HTTP::Post.new(uri.request_uri)
+      # request.body = post_body
+      # response= http.request(request)
+      # resp=response.body
+      # resp = ActiveSupport::JSON.decode(resp)
+    # rescue Exception => e  
+        # tries += 1
+        # puts "Error: #{e.message}"
+        # puts "Trying again analyze!" if tries <= 10
+        # retry if tries <= 10
+        # puts "No more attempts in analyzing!"  
+    # end
+#     
+    # if !resp.nil? and !resp.empty?
+#       
+      # @listids[0,100].zip(resp).each do |l, a|
+        # @article=Article.find(l)
+        # @article.polarity=a[1]
+        # @article.coloured_text=a[0]
+        # @article.save
+      # end
+    # end
+    # @list=@list[100..@list.length]
+    # @listids=@listids[100..@listids.length]
+    # if !@listids.nil?
+      # puts "id is #{@listids[0]}"
+    # end
+    # end
+  # end
   
   def getTweets2(url)
 	resp=roundGetResponse(url)
@@ -95,19 +219,21 @@ class Tweets < ActiveRecord::Base
 		tries=0
 		
     
-		if Article.where(:id_str=>k, :target_id => @kid).empty?
-		  begin
-  		  conn = Net::HTTP.post_form(uri, "text"=> v )
-        resp= conn.body
-        resp = ActiveSupport::JSON.decode(resp)
-  		  a= Article.create(:id_str => k, :body => v, :source_id=> s.id, :date=> v2, :target_id => @kid, :polarity => resp[2], :coloured_text => resp[0])
-		  rescue Exception => e  
-        tries += 1
-        puts "Error: #{e.message}"
-        puts "Trying again!" if tries <= 10
-        retry if tries <= 10
-        puts "No more attempts!"
-  		end
+		if Article.where(:id_str=>k, :target_id => @kid, :source_id => s.id).empty?
+		  #begin
+  		  #conn = Net::HTTP.post_form(uri, "text"=> v )
+        #resp= conn.body
+        #resp = ActiveSupport::JSON.decode(resp)
+  		  a= Article.create(:id_str => k, :body => v, :source_id=> s.id, :date=> v2, :target_id => @kid)#, :polarity => resp[2], :coloured_text => resp[0])
+		    @list<<v
+		    @listids<<a.id
+		  #rescue Exception => e  
+        #tries += 1
+        #puts "Error: #{e.message}"
+        #puts "Trying again!" if tries <= 10
+        #retry if tries <= 10
+        #puts "No more attempts!"
+  		#end
   	end
 		
 		map_tweets[k.to_i] = [v2,v]
@@ -159,10 +285,11 @@ class Tweets < ActiveRecord::Base
 			
 			tries += 1
       puts "Error: #{e.message}"
-      puts "Trying again!" if tries <= 10
-      retry if tries <= 10
+      puts "Trying again!" if tries <= 3
+      retry if tries <= 3
       puts "No more attempts!"
-
+      
+      
 			#puts "Try again"
 			#sleep(10)
 			#roundGetResponse(url)
