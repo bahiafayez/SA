@@ -77,6 +77,12 @@ class Akhbarak < ActiveRecord::Base
 		s=Source.find_by_name("Articles")  # for now
 		
 		if Article.where(:id_str=>id, :target_id => @kid, :source_id =>s.id).empty?
+		
+		@words2=['ا.','د.','م.']    #remove these because these don't represent the end of a sentence.
+    @words2.each do |a|
+      description.gsub!(a,'')
+    end
+		  
 		sentences=description.split('.')       # defining new sentences with . is that enough?? or also ' ? also dr. won't work..
 		print "sentences areeeeeeeeeeee \n #{sentences}"
 		@words=Target.find(@kid).query.gsub /"/, ''

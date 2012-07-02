@@ -182,6 +182,7 @@ DEPENDENCIES
   rails (= 3.2.2.rc1)
   sass-rails
   sqlite3
+  therubyracer
   twitter
   twitter-bootstrap-rails
   uglifier (>= 1.0.3)

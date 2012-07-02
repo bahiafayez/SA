@@ -9,6 +9,7 @@ gem "meta_search",    '>= 1.1.0.pre'
 gem "twitter"
 gem 'whenever', :require => false
 gem 'sass-rails'
+#gem 'libv8', '3.3.10.4'
 # Gems used only for assets and not required
 # in production environments by default.
 #group :assets do
@@ -16,7 +17,7 @@ gem 'sass-rails'
   gem 'coffee-rails', '~> 3.2.1'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  # gem 'therubyracer'
+  gem 'therubyracer'
 
   gem 'uglifier', '>= 1.0.3'
   gem 'twitter-bootstrap-rails'
