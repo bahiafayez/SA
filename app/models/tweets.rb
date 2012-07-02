@@ -116,6 +116,8 @@ class Tweets < ActiveRecord::Base
           }
         end
       end
+    else
+       analyzeTweets(analyzed, theids)
     end
     
     #if !@listids.nil?
