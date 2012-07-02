@@ -18,7 +18,8 @@ gem 'sass-rails'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
   gem 'therubyracer'
-
+  gem 'capistrano'
+  gem 'passenger'
   gem 'uglifier', '>= 1.0.3'
   gem 'twitter-bootstrap-rails'
 #end
@@ -31,7 +32,8 @@ group :development, :test do
 end
 
 group :production do
-  gem 'pg'
+  gem 'mysql2'
+  #gem 'pg'
 end
 
 # To use ActiveModel has_secure_password
