@@ -5,290 +5,140 @@
 
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
-
-      // Load the Visualization API and the piechart package.
-      google.load('visualization', '1.0', {'packages':['corechart']});
-
-      // Set a callback to run when the Google Visualization API is loaded.
-      //google.setOnLoadCallback(drawChart);
-
-	 var dataReceived, chart11, data11, options11, data22, chart22, options22, dataReceived22, data33, chart33, options33, dataReceived33, data44, chart44, options44, dataReceived44
-	 	dataReceived=[];
-	 	dataReceived22=[];
-	 	dataReceived33=[];
-	 	dataReceived44=[];
+    
+      function myChart(src, typ)
+    {
+    	this.chart="";
+    	this.source=src;
+    	this.type=typ;
+    	this.dataReceived=[];
+    	this.data="";
+    	this.options="";
+    }
+    
+    
+    var allCharts=[];
+    
+    allCharts[0]= new myChart("twitter", "mentions");
+    allCharts[1]= new myChart("twitter", "sentiments");
+    allCharts[2]= new myChart("articles", "mentions")
+    allCharts[3]= new myChart("articles", "sentiments");
+    
+    // Load the Visualization API and the piechart package.
+    google.load('visualization', '1.0', {'packages':['corechart']});      
+      
+	 google.setOnLoadCallback(function(){ 
 	 	
-     google.setOnLoadCallback(drawChart11);
-      function drawChart11() {
+	 	for(var i=0; i<allCharts.length; i++)
+	 	{
+	 		drawChart11(allCharts[i]);
+	 	}
+	 	})
+	 //google.setOnLoadCallback(function(){ drawChart11(secondChart) })
+	
+     
+      function drawChart11(theChart) {
       	
-      	data11 = new google.visualization.DataTable();
-        data11.addColumn('datetime','Date');
-        data11.addColumn('number', 'Mentions')
+      	if (theChart.type=="mentions")
+      	{
+      	theChart.data = new google.visualization.DataTable();
+        theChart.data.addColumn('datetime','Date');
+        theChart.data.addColumn('number', 'Mentions')
       
       	
-        data11.addRows(dataReceived)
+        theChart.data.addRows(theChart.dataReceived)
  
-         options11 = {
-          title: 'Twitter',
-          'width':500, 'height':200
+         theChart.options = {
+          title: theChart.source+" "+theChart.type,
+          'width':460, 'height':200
         };
 
-        chart11 = new google.visualization.LineChart(document.getElementById('chart_div11'));
-        
-        chart11.draw(data11, options11);
-        
-      }
-
-      //
-      
- function updateControlCandidates11(a,b) {
-      	
-      	console.debug("a iss")
-      	console.debug(a)
-      	a=document.getElementById('keywords')
-      	val=a.options[a.selectedIndex].value
-      	// this is the keyword
-      	console.debug(val)
-      	getSelected();
-		getKey(val, "twitter",b);	
-	}
-	
-function getSelected() {
-      	
-
-      	a=document.getElementById('keywords');
-      	val=a.options[a.selectedIndex].value;
-		//return val;
-		url = "/articles/getSelected";
-		 $.getJSON(url,{val:val} ,function(data5) {
-	    console.log(data5);
-	 });
-	}
-	
-	
-getKey = function(val, source,b) {
-  var url;
-  url = void 0;
-  url = "/articles/get_mentions";
-  return $.getJSON(url,{val:val, src:source} ,function(data5) {
-    //console.log(data5);
-    for(var i=0; i<data5.length; i++)
-    {
-    	//console.debug(data5[i][0])
-    	data5[i][0]= new Date(data5[i][0])
-    }
-    dataReceived=data5;
-    if (b == true)
-    	return
-    else
-    	drawChart11();
-    
-     
-  });
-};
-
-////////// SECOND CHART //////////////
-
-google.setOnLoadCallback(drawChart22);
-      function drawChart22() {
-      	
-      	data22 = new google.visualization.DataTable();
-        data22.addColumn('string','Date');
-        data22.addColumn('number', 'Negative')
-        data22.addColumn('number', 'Neutral')
-        data22.addColumn('number', 'Positive')
+        theChart.chart = new google.visualization.LineChart(document.getElementById(theChart.source+"_"+theChart.type));
+       }
+       else
+       {
+       	theChart.data = new google.visualization.DataTable();
+        theChart.data.addColumn('string','Date');
+        theChart.data.addColumn('number', 'Negative')
+        theChart.data.addColumn('number', 'Neutral')
+        theChart.data.addColumn('number', 'Positive')
        
+        theChart.data.addRows(theChart.dataReceived)
         
-        
-        data22.addRows(dataReceived22)
-        
-        
-
-         options22 = {
-          //title: 'Company Performance',
+         theChart.options = {
+          title: theChart.source+" "+theChart.type,
           //hAxis: {title: 'Year', titleTextStyle: {color: 'red'}},
           isStacked: true,
-     	 'width':500, 'height':200,
+     	 'width':460, 'height':200,
           colors: ['red','yellow','#00AA11']
         };
 
-        chart22 = new google.visualization.ColumnChart(document.getElementById('chart_div22'));
+        theChart.chart = new google.visualization.ColumnChart(document.getElementById(theChart.source+"_"+theChart.type));
+
+       }
         
-        chart22.draw(data22, options22);
-      }
-      
- function updateControlCandidates22(a) {
-      	
-      	
-      	a=document.getElementById('keywords')
-      	val=a.options[a.selectedIndex].value
-      	// this is the keyword
-      	console.debug(val)
-      	
-		getKey22(val, "twitter");
-		
-		//chart.draw(data,options);
-	}
-	  
-
-
-getKey22 = function(val, source) {
-  var url;
-  url = void 0;
-  url = "/articles/get_count";
-  return $.getJSON(url,{val:val, src:source} ,function(data5) {
-    console.log(data5);
-    
-    dataReceived22=data5;
-    drawChart22();
-     
-  });
-};
-
-///////// Third Chart /////////////////////
-
- google.setOnLoadCallback(drawChart33);
-      function drawChart33() {
-      	
-      	data33 = new google.visualization.DataTable();
-        data33.addColumn('datetime','Date');
-        data33.addColumn('number', 'Mentions')
-      
-      	
-        data33.addRows(dataReceived33)
- 
-         options33 = {
-          title: 'Articles',
-          'width':500, 'height':200
-        };
-
-        chart33 = new google.visualization.LineChart(document.getElementById('chart_div33'));
-        
-        chart33.draw(data33, options33);
+        theChart.chart.draw(theChart.data, theChart.options);
         
       }
-
-      //
       
- function updateControlCandidates33(a,b) {
+ function updateControlCandidates11(obj) {
       	
-      	console.debug("a iss")
-      	console.debug(a)
+      	//console.debug("a iss")
+      	//console.debug(a)
       	a=document.getElementById('keywords')
       	val=a.options[a.selectedIndex].value
       	// this is the keyword
       	console.debug(val)
       	//getSelected();
-		getKey33(val, "articles",b);	
+		getKey(val, obj );	
 	}
 	
-getKey33 = function(val, source,b) {
+getKey = function(val, obj) {
   var url;
   url = void 0;
-  url = "/articles/get_mentions";
-  return $.getJSON(url,{val:val, src:source} ,function(data5) {
+  if (obj.type=="mentions"){
+  	url = "/articles/get_mentions";	
+  }
+  else{
+  	url = "/articles/get_count";
+  }
+  
+
+  return $.getJSON(url,{val:val, src:obj.source} ,function(data5) {
     //console.log(data5);
+    
+    if (obj.type=="mentions"){
+  	
     for(var i=0; i<data5.length; i++)
     {
-    	//console.debug(data5[i][0])
     	data5[i][0]= new Date(data5[i][0])
     }
-    dataReceived33=data5;
-    if (b == true)
-    	return
-    else
-    	drawChart33();
+    
+    }
+    obj.dataReceived=data5;
+    drawChart11(obj);
     
      
   });
 };
-
-///////// Fourth Chart /////////////////////
-
- google.setOnLoadCallback(drawChart44);
-      function drawChart44() {
-      	
-      	data44 = new google.visualization.DataTable();
-        data44.addColumn('string','Date');
-        data44.addColumn('number', 'Negative')
-        data44.addColumn('number', 'Neutral')
-        data44.addColumn('number', 'Positive')
-       
-        
-        
-        data44.addRows(dataReceived44)
-        
-        
-
-         options44 = {
-          //title: 'Company Performance',
-          //hAxis: {title: 'Year', titleTextStyle: {color: 'red'}},
-          isStacked: true,
-     	 'width':500, 'height':200,
-          colors: ['red','yellow','#00AA11']
-        };
-
-        chart44 = new google.visualization.ColumnChart(document.getElementById('chart_div44'));
-        
-        chart44.draw(data44, options44);
-      }
-      
- function updateControlCandidates44(a) {
-      	
-      	
-      	a=document.getElementById('keywords')
-      	val=a.options[a.selectedIndex].value
-      	// this is the keyword
-      	console.debug(val)
-      	
-		getKey44(val, "articles");
-		
-		//chart.draw(data,options);
-	}
-	  
-
-
-getKey44 = function(val, source) {
-  var url;
-  url = void 0;
-  url = "/articles/get_count";
-  return $.getJSON(url,{val:val, src:source} ,function(data5) {
-    console.log(data5);
-    
-    dataReceived44=data5;
-    drawChart44();
-     
-  });
-};
-
-//////////////////////////////////////////
 
 
 	updateAll = function(a)
 	{
-		updateControlCandidates11(a);
-		updateControlCandidates22(a);
-		updateControlCandidates33(a);
-		updateControlCandidates44(a);
+		for(var i=0; i<allCharts.length; i++)
+	 	{
+	 		updateControlCandidates11(allCharts[i]);
+	 	}
+	
 	}
 
 
 	$(document).ready(function() {
-  		//updateControlCandidates11();
-  		//updateControlCandidates22();
+  		
   		updateAll();
   		
   
 	});
-	
-	
-// $(function($) {
-    // $("#link").click(function() {
-        // $.ajax({url: '<%= url_for :action => 'sentiments' %>',
-        // data: 'selected=' + document.getElementById('keywords').value,
-        // dataType: 'script'})
-    // });
-//});
 
 
     </script>
@@ -300,26 +150,23 @@ getKey44 = function(val, source) {
 	</div></center>
 <div class="span12">			
 <div class="span4">
-			<div id="chart_div22" ></div>
+			<div id="twitter_sentiments" ></div>
 			<center><%= submit_tag "Detailed View", :name => "twitter_sentiments" %></center>
-			
 			
 </div>
 <div class="span4">
-			<div id="chart_div44" ></div>
+			<div id="articles_sentiments" ></div>
 			<center><%= submit_tag "Detailed View", :name => "articles_sentiments" %></center>
-			
-			
 </div>
 </div>
 <div class="span12">
 <div class="span4">
-			<div id="chart_div11" ></div>
+			<div id="twitter_mentions" ></div>
 			<center><%= submit_tag "Detailed View" , :name => "twitter_mentions" %></center>
 			
 </div>
 <div class="span4">
-			<div id="chart_div33" ></div>
+			<div id="articles_mentions" ></div>
 			<center><%= submit_tag "Detailed View" , :name => "articles_mentions" %></center>
 			
 </div>
