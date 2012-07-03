@@ -16,7 +16,7 @@
     	this.options="";
     }
     
-    
+    var count=0;
     var allCharts=[];
     
     allCharts[0]= new myChart("twitter", "mentions");
@@ -42,15 +42,16 @@
       	if (theChart.type=="mentions")
       	{
       	theChart.data = new google.visualization.DataTable();
-        theChart.data.addColumn('datetime','Date');
+        theChart.data.addColumn('string','Date');
         theChart.data.addColumn('number', 'Mentions')
-      
+      	theChart.data.addColumn({type:'string',role:'tooltip'});
+
       	
         theChart.data.addRows(theChart.dataReceived)
  
          theChart.options = {
           title: theChart.source+" "+theChart.type,
-          'width':460, 'height':200
+          'width':460, 'height':200, pointSize: 5
         };
 
         theChart.chart = new google.visualization.LineChart(document.getElementById(theChart.source+"_"+theChart.type));
@@ -88,9 +89,9 @@
       	a=document.getElementById('keywords')
       	val=a.options[a.selectedIndex].value
       	// this is the keyword
-      	console.debug(val)
+      	//console.debug(val)
       	//getSelected();
-		getKey(val, obj );	
+		getKey(val, obj);	
 	}
 	
 getKey = function(val, obj) {
@@ -103,28 +104,35 @@ getKey = function(val, obj) {
   	url = "/articles/get_count";
   }
   
-
+ 
   return $.getJSON(url,{val:val, src:obj.source} ,function(data5) {
     //console.log(data5);
     
-    if (obj.type=="mentions"){
-  	
-    for(var i=0; i<data5.length; i++)
-    {
-    	data5[i][0]= new Date(data5[i][0])
-    }
-    
-    }
+    // if (obj.type=="mentions"){
+//   	
+    // for(var i=0; i<data5.length; i++)
+    // {
+    	// data5[i][0]= new Date(data5[i][0])
+    // }
+//     
+    // }
+    count=count+1;
     obj.dataReceived=data5;
     drawChart11(obj);
     
-     
+    if(count==allCharts.length)
+    {
+    document.getElementById('loading').innerHTML ="";
+    count=0;
+    }
+    
   });
 };
 
 
 	updateAll = function(a)
 	{
+		document.getElementById('loading').innerHTML =( '<%= image_tag "loading2.gif", :alt=>"" %> ' );
 		for(var i=0; i<allCharts.length; i++)
 	 	{
 	 		updateControlCandidates11(allCharts[i]);
@@ -144,10 +152,16 @@ getKey = function(val, obj) {
     </script>
 <div>
 	<%= form_tag charts_check_path do %>
-	<center><div id="candidate_chooser2">
+	<center>
+	<div style="height:100px">
+		<div style="float:left; width:100%" id="candidate_chooser2">
 					<%= select_tag 'keywords', options_from_collection_for_select(Target.all, :id, :name) , :onchange =>"updateAll(this)"%>
 							
-	</div></center>
+	</div>
+	<div style="width: 100px; height: 100px" id="loading"></div>
+	
+	</div>
+	</center>
 <div class="span12">			
 <div class="span4">
 			<div id="twitter_sentiments" ></div>

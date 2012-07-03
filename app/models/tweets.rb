@@ -76,9 +76,10 @@ class Tweets < ActiveRecord::Base
     
   end
   
+
   def analyzeTweets(analyzed, theids)
-   # uri = URI.parse("http://omp.sameh.webfactional.com/taggingList")
-    uri = URI.parse("http://names.alwaysdata.net/taggingList")
+    uri = URI.parse("http://omp.sameh.webfactional.com/taggingList")
+    #uri = URI.parse("http://names.alwaysdata.net/taggingList")
     
     #while !@list.nil? and !@list.empty? do
     tries=0
@@ -96,17 +97,17 @@ class Tweets < ActiveRecord::Base
     rescue Exception => e  
         tries += 1
         puts "Error: #{e.message}"
-        puts "Trying again analyze!" if tries <= 10
-        retry if tries <= 10
+        puts "Trying again analyze!" if tries <= 3
+        retry if tries <= 3
         puts "No more attempts in analyzing!"  
     end
     
     
    
-    if !resp.nil? and !resp.empty?         #TRY AGAIN THEN TRY SEQUENTIAL WITH 500 EACH TIME TO MAKE SURE THIS IS BETTER
-      if resp.length != theids.length
-        analyzeTweets(analyzed, theids)
-      else
+    if !resp.nil? and !resp.empty? and resp.kind_of?(Array) and resp.length == theids.length        #TRY AGAIN THEN TRY SEQUENTIAL WITH 500 EACH TIME TO MAKE SURE THIS IS BETTER
+      #if resp.length != theids.length
+      #  analyzeTweets(analyzed, theids)
+      #else
         theids.zip(resp).each do |l, a|
           @lock.synchronize{
           article=Article.find(l)
@@ -115,9 +116,11 @@ class Tweets < ActiveRecord::Base
           article.save
           }
         end
-      end
-    else
-       analyzeTweets(analyzed, theids)
+      #end
+    #elsif (resp.nil? or resp.empty?) and tries <= 10
+    #   analyzeTweets(analyzed, theids)
+    else 
+      puts "error"
     end
     
     #if !@listids.nil?
@@ -154,7 +157,7 @@ class Tweets < ActiveRecord::Base
         # puts "No more attempts in analyzing!"  
     # end
 #     
-    # if !resp.nil? and !resp.empty?
+    # if !resp.nil? and !resp.empty? and resp.kind_of?(Array)
 #       
       # @listids[0,100].zip(resp).each do |l, a|
         # @article=Article.find(l)
