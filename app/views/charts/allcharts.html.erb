@@ -42,15 +42,16 @@
       	if (theChart.type=="mentions")
       	{
       	theChart.data = new google.visualization.DataTable();
-        theChart.data.addColumn('datetime','Date');
+        theChart.data.addColumn('string','Date');
         theChart.data.addColumn('number', 'Mentions')
-      
+      	theChart.data.addColumn({type:'string',role:'tooltip'});
+
       	
         theChart.data.addRows(theChart.dataReceived)
  
          theChart.options = {
           title: theChart.source+" "+theChart.type,
-          'width':460, 'height':200
+          'width':460, 'height':200, pointSize: 5
         };
 
         theChart.chart = new google.visualization.LineChart(document.getElementById(theChart.source+"_"+theChart.type));
@@ -107,14 +108,14 @@ getKey = function(val, obj) {
   return $.getJSON(url,{val:val, src:obj.source} ,function(data5) {
     //console.log(data5);
     
-    if (obj.type=="mentions"){
-  	
-    for(var i=0; i<data5.length; i++)
-    {
-    	data5[i][0]= new Date(data5[i][0])
-    }
-    
-    }
+    // if (obj.type=="mentions"){
+//   	
+    // for(var i=0; i<data5.length; i++)
+    // {
+    	// data5[i][0]= new Date(data5[i][0])
+    // }
+//     
+    // }
     obj.dataReceived=data5;
     drawChart11(obj);
     

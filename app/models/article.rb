@@ -25,6 +25,12 @@ class Article < ActiveRecord::Base
     self.date.strftime('%d %B, %Y')
   end
   
+  def self.getMissingTweets()
+    p=MissingTweets.new()
+    p.getTweets() 
+    
+  end
+  
   def self.getAkhbar2()
     Target.all.each do |t|
       getAkhbar(t.id)

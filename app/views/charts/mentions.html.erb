@@ -19,13 +19,14 @@
       function drawChart11() {
       	
       	data11 = new google.visualization.DataTable();
-        data11.addColumn('datetime','Date');
+        data11.addColumn('string','Date');
         data11.addColumn('number', '<%= @target %>')
+      	data11.addColumn({type:'string',role:'tooltip'});
       
         data11.addRows(dataReceived)
  
          options11 = {
-          title: "<%= @src %>",
+          title: "<%= @src %>", pointSize: 5
           //'width':500, 'height':400
         };
 
@@ -41,7 +42,11 @@
 		    if (item.row != null && item.column != null) {
 		     charttype=document.getElementById('stat').value	
 		     getText(<%= @val %>, data11.getValue(item.row, 0), "<%= @src %>", charttype)
+		      //message = "Loading ..."
 		      message += data11.getColumnLabel(item.column) + ' : ' + data11.getValue(item.row, item.column) + ',date: ' + data11.getValue(item.row, 0);  
+		     
+		     //$('#here').innerhtml('<img src="loading.gif" />');
+				document.getElementById('here').innerHTML =( '<%= image_tag "loading2.gif", :alt=>'' %>' );
 		    } else if (item.row != null) {
 		      message += '{row:' + item.row + '}';
 		    } else if (item.column != null) {
@@ -56,7 +61,7 @@
 		  charttype=document.getElementById('stat').value
 		  
 		  
-		  $('#here').text(message)
+		  //$('#here').text(message)
 		          
         }
 	 
@@ -98,11 +103,11 @@ getKey = function(val, source, stat) {
   url = "/articles/get_mentions";
   return $.getJSON(url,{val:val, src:source, stat:stat} ,function(data5) {
     //console.log(data5);
-    for(var i=0; i<data5.length; i++)
-    {
-    	console.debug(data5[i][0])
-    	data5[i][0]= new Date(data5[i][0])
-    }
+    // for(var i=0; i<data5.length; i++)
+    // {
+    	// console.debug(data5[i][0])
+    	// data5[i][0]= new Date(data5[i][0])
+    // }
     dataReceived=data5;
     drawChart11();
      

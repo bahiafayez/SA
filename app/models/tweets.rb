@@ -77,8 +77,8 @@ class Tweets < ActiveRecord::Base
   end
   
   def analyzeTweets(analyzed, theids)
-    #uri = URI.parse("http://omp.sameh.webfactional.com/taggingList")
-    uri = URI.parse("http://names.alwaysdata.net/taggingList")
+    uri = URI.parse("http://omp.sameh.webfactional.com/taggingList")
+    #uri = URI.parse("http://names.alwaysdata.net/taggingList")
     
     #while !@list.nil? and !@list.empty? do
     tries=0
@@ -116,8 +116,10 @@ class Tweets < ActiveRecord::Base
           }
         end
       end
-    else
+    elsif (resp.nil? or resp.empty?) and tries <= 10
        analyzeTweets(analyzed, theids)
+    else 
+      puts "error"
     end
     
     #if !@listids.nil?
