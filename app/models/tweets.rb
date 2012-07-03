@@ -77,7 +77,7 @@ class Tweets < ActiveRecord::Base
   end
   
   def analyzeTweets(analyzed, theids)
-    #uri = URI.parse("http://omp.sameh.webfactional.com/taggingList")
+   # uri = URI.parse("http://omp.sameh.webfactional.com/taggingList")
     uri = URI.parse("http://names.alwaysdata.net/taggingList")
     
     #while !@list.nil? and !@list.empty? do
