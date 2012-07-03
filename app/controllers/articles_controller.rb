@@ -176,14 +176,14 @@ class ArticlesController < ApplicationController
           print "#{hour} : #{posts.count}"
           only=Time.parse(hour)
           only=only.strftime('%H:00')
-          count<<[hour,posts.count, "#{hour}\n Mentions: #{posts.count}"]
+          count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]
           end
         elsif params[:stat]=="per day"
           @a.group_by(&:day).sort.each do |hour, posts|
           print "Here"
           gg=gg+posts.count
           print "#{hour} : #{posts.count}"
-          count<<[hour,posts.count, hour]
+          count<<[hour,posts.count, "#{hour}\n Mentions: #{posts.count}"]
           end
         else
           @a.group_by(&:hour).sort.each do |hour, posts|
@@ -192,7 +192,7 @@ class ArticlesController < ApplicationController
           print "#{hour} : #{posts.count}"
           only=Time.parse(hour)
           only=only.strftime('%H:00')
-          count<<[hour,posts.count, "#{hour}\n Mentions: #{posts.count}"]
+          count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]
           end
         end
         

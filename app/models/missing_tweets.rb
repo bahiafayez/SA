@@ -29,7 +29,7 @@ class MissingTweets < ActiveRecord::Base
     
     while !@list.nil? and !@list.empty? do
     tries=0
-    to_tag_json = ActiveSupport::JSON.encode(@list[0,300])
+    to_tag_json = ActiveSupport::JSON.encode(@list[0,100])
     post_body = to_tag_json
     begin
       http = Net::HTTP.new(uri.host, uri.port)
@@ -43,22 +43,22 @@ class MissingTweets < ActiveRecord::Base
     rescue Exception => e  
         tries += 1
         puts "Error: #{e.message}"
-        puts "Trying again analyze!" if tries <= 10
-        retry if tries <= 10
+        puts "Trying again analyze!" if tries <= 3
+        retry if tries <= 3
         puts "No more attempts in analyzing!"  
     end
     
-    if !resp.nil? and !resp.empty?
-      
-      @listids[0,300].zip(resp).each do |l, a|
+    puts "resp is #{resp}"
+    if !resp.nil? and !resp.empty? and resp.kind_of?(Array)
+      @listids[0,100].zip(resp).each do |l, a|
         @article=Article.find(l)
         @article.polarity=a[1]
         @article.coloured_text=a[0]
         @article.save
       end
     end
-    @list=@list[300..@list.length]
-    @listids=@listids[300..@listids.length]
+    @list=@list[100..@list.length]
+    @listids=@listids[100..@listids.length]
     if !@listids.nil?
       puts "id is #{@listids[0]}"
     end
@@ -111,14 +111,14 @@ class MissingTweets < ActiveRecord::Base
     # rescue Exception => e  
         # tries += 1
         # puts "Error: #{e.message}"
-        # puts "Trying again analyze!" if tries <= 10
-        # retry if tries <= 10
+        # puts "Trying again analyze!" if tries <= 3
+        # retry if tries <= 3
         # puts "No more attempts in analyzing!"  
     # end
 #     
 #     
 #    
-    # if !resp.nil? and !resp.empty?         #TRY AGAIN THEN TRY SEQUENTIAL WITH 500 EACH TIME TO MAKE SURE THIS IS BETTER
+    # if !resp.nil? and !resp.empty? and resp.kind_of?(Array)        #TRY AGAIN THEN TRY SEQUENTIAL WITH 500 EACH TIME TO MAKE SURE THIS IS BETTER
       # if resp.length != theids.length
         # analyzeTweets(analyzed, theids)
       # else
@@ -131,8 +131,8 @@ class MissingTweets < ActiveRecord::Base
           # }
         # end
       # end
-    # else
-       # analyzeTweets(analyzed, theids)
+    ## else
+       ## analyzeTweets(analyzed, theids)
     # end
 #     
     # #if !@listids.nil?
