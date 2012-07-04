@@ -49,7 +49,7 @@ class MissingTweets < ActiveRecord::Base
     end
     
     puts "resp is #{resp}"
-    if !resp.nil? and !resp.empty? and resp.kind_of?(Array)
+    if !resp.nil? and !resp.empty? and resp.kind_of?(Array) and @listids[0,100].length == resp.length
       @listids[0,100].zip(resp).each do |l, a|
         @article=Article.find(l)
         @article.polarity=a[1]

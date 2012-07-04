@@ -113,6 +113,8 @@ class ArticlesController < ApplicationController
           checkdate= Time.parse(hour).to_formatted_s(:db)
           checkdate2=next_day.to_formatted_s(:db)
           
+          
+          
           @positive=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity > 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
           @neutral=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity = 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
           @negative=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity < 0 and date BETWEEN ? AND ? ", s.id, val, checkdate,  checkdate2])
@@ -126,8 +128,11 @@ class ArticlesController < ApplicationController
           print "#{hour} : #{posts.count}"
           next_hour=1.hours.since Time.parse(hour)
           
-          checkdate= Time.parse(hour).to_formatted_s(:db)
-          checkdate2=next_hour.to_formatted_s(:db)
+          checkdate= Time.parse(hour).utc.to_s  #needed to add utc because search is in utc!? for some reason.. even though config is local time..
+          checkdate2=next_hour.utc.to_s       #needed to add utc because search is in utc!? for some reason.. even though config is local time..
+          
+          puts "checkdate isss #{checkdate}"
+          puts "checkdate2 isss #{checkdate2}"
           
           @positive=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity > 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
           @neutral=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity = 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
@@ -171,12 +176,13 @@ class ArticlesController < ApplicationController
         
         if params[:stat]=="per hour"
           @a.group_by(&:hour).sort.each do |hour, posts|
-          print "Here"
-          gg=gg+posts.count
-          print "#{hour} : #{posts.count}"
-          only=Time.parse(hour)
-          only=only.strftime('%H:00')
-          count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]
+            #puts "hour isss #{Time.parse(hour)}" 
+            print "Here"
+            gg=gg+posts.count
+            print "#{hour} : #{posts.count}"
+            only=Time.parse(hour)
+            only=only.strftime('%H:00')
+            count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]
           end
         elsif params[:stat]=="per day"
           @a.group_by(&:day).sort.each do |hour, posts|
@@ -187,6 +193,8 @@ class ArticlesController < ApplicationController
           end
         else
           @a.group_by(&:hour).sort.each do |hour, posts|
+          #zone = ActiveSupport::TimeZone.new("Cairo")
+          #puts "hour isss #{Time.parse(hour)}"  
           print "Here"
           gg=gg+posts.count
           print "#{hour} : #{posts.count}"
@@ -220,10 +228,10 @@ class ArticlesController < ApplicationController
     date3=date.to_datetime
     print date2
     print date3
-    checkdate= Time.parse(date).to_formatted_s(:db)
+    checkdate= Time.parse(date).utc.to_formatted_s(:db)
     print "over hereeeeee"
     #a= 1.minutes.since Time.parse(date)
-    checkdate2=a.to_formatted_s(:db)
+    checkdate2=a.utc.to_formatted_s(:db)
     # checkdate2= Time.zone.parse(date2).utc.to_formatted_s(:db)
     # print "checkdate issss"
      print checkdate

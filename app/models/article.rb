@@ -14,6 +14,7 @@ class Article < ActiveRecord::Base
   belongs_to :target
   
   def minute
+    #self.date << " UTC" 
     self.date.strftime('%d %B, %Y %H:%M')
   end
   
