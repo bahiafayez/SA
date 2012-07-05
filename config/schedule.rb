@@ -10,6 +10,7 @@
 every 1.hours do
 # #   command "/usr/bin/some_great_command"
     runner "Article.getTweets(3)"
+    runner "Article.getAkhbar(3)"
 # #   rake "some:great:rake:task"
 end
 #
