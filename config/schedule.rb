@@ -7,7 +7,7 @@
 #
 # set :output, "/path/to/my/cron_log.log"
 #
-every 1.hours do
+every 15.minutes do
 # #   command "/usr/bin/some_great_command"
     runner "Article.getAll(3)"
     
