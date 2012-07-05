@@ -26,7 +26,12 @@ class Akhbarak < ActiveRecord::Base
   def getArticles(kid, hash_tag) #, num_pages #this id to say start from which (since_id...)
     @kid=kid
     @hashtag=hash_tag
-    @maxid=Article.where(:source_id => 2, :target_id => @kid).first.id_str  # the last id from last time.
+    
+    if !Article.where(:source_id => 2, :target_id => @kid).empty?
+      @maxid=Article.where(:source_id => 2, :target_id => @kid).first.id_str  # the last id from last time.
+    else
+      @maxid=0
+    end
     
    
       url= "#{@url_search2}#{hash_tag}/page/#{@page}/per_page/100.json"
