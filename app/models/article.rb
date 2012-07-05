@@ -44,6 +44,11 @@ class Article < ActiveRecord::Base
     end
   end
   
+  def self.getAll(id)
+    getAkhbar(id)
+    getTweets(id)
+  end
+  
   def self.getTweets(keyword_id)
     keyword=Target.find(keyword_id.to_i)
     print "keyword id issssss"
