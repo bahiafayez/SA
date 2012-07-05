@@ -104,7 +104,7 @@ class ArticlesController < ApplicationController
         gg=0
         prevHour=""
         if params[:stat]=="per day"
-          @a.group_by(&:day).sort.each do |hour, posts|
+          @a.group_by(&:day).sort{|x,y| Time.parse(x[0]) <=> Time.parse(y[0])}.each do |hour, posts|
           print "Here"
           gg=gg+posts.count
           print "#{hour} : #{posts.count}"
@@ -138,7 +138,8 @@ class ArticlesController < ApplicationController
           prevHour=checkdate3
           end
         else
-          @a.group_by(&:hour).sort.each do |hour, posts|
+          lastDate=@a.first.date
+          @a.group_by(&:hour).sort{|x,y| Time.parse(x[0]) <=> Time.parse(y[0])}.each do |hour, posts|
           print "Here"
           gg=gg+posts.count
           print "#{hour} : #{posts.count}"
@@ -148,6 +149,11 @@ class ArticlesController < ApplicationController
           checkdate= Time.parse(hour).utc.to_s  #needed to add utc because search is in utc!? for some reason.. even though config is local time..
           checkdate2=next_hour.utc.to_s       #needed to add utc because search is in utc!? for some reason.. even though config is local time..
           checkdate3=next_hour.utc
+          
+          puts "date difference issssss#{lastDate - checkdate0}"
+          if lastDate - checkdate0  > 86400
+            next
+          end
           
           # Filling in zeros
           if prevHour.kind_of?(Time)
@@ -208,7 +214,7 @@ class ArticlesController < ApplicationController
         gg=0
         prevHour=""
         if params[:stat]=="per hour"
-          @a.group_by(&:hour).sort.each do |hour, posts|
+          @a.group_by(&:hour).sort{|x,y| Time.parse(x[0]) <=> Time.parse(y[0])}.each do |hour, posts|
             #puts "hour isss #{Time.parse(hour)}" 
             # FILLING IN ZEROS WHERE THERE ARE NO MENTIONS
             if prevHour.kind_of?(Time)
@@ -232,7 +238,7 @@ class ArticlesController < ApplicationController
             prevHour=Time.parse(hour)
           end
         elsif params[:stat]=="per day"
-          @a.group_by(&:day).sort.each do |hour, posts|
+          @a.group_by(&:day).sort{|x,y| Time.parse(x[0]) <=> Time.parse(y[0])}.each do |hour, posts|
           if prevHour.kind_of?(Time)
                diff=Time.parse(hour)-prevHour
                diff2= diff/86400  #to get days
@@ -252,7 +258,7 @@ class ArticlesController < ApplicationController
           prevHour=Time.parse(hour)
           end
         else
-          @a.group_by(&:hour).sort.each do |hour, posts|
+          @a.group_by(&:hour).sort{|x,y| Time.parse(x[0]) <=> Time.parse(y[0])}.each do |hour, posts|
           #zone = ActiveSupport::TimeZone.new("Cairo")
           #puts "hour isss #{Time.parse(hour)}"
           if prevHour.kind_of?(Time)
