@@ -102,7 +102,7 @@ class ArticlesController < ApplicationController
         #@neutral=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity = 0", s.id, keyword])
         #@negative=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity < 0", s.id, keyword])
         gg=0
-        
+        prevHour=""
         if params[:stat]=="per day"
           @a.group_by(&:day).sort.each do |hour, posts|
           print "Here"
@@ -113,13 +113,29 @@ class ArticlesController < ApplicationController
           checkdate= Time.parse(hour).to_formatted_s(:db)
           checkdate2=next_day.to_formatted_s(:db)
           
+          checkdate0= Time.parse(hour)
+          checkdate3=next_day
           
+          # Filling in zeros
+          if prevHour.kind_of?(Time)
+               diff=checkdate0-prevHour
+               diff2= diff/86400  #to get days
+               fromDate=prevHour
+               nextHour=fromDate
+                 while diff2> 0 
+                   count<<[nextHour.strftime('%d %B, %Y'), 0,0,0]
+                   nextHour= 1.day.since fromDate
+                   diff2-=1 
+                   fromDate=nextHour
+                 end
+            end
           
           @positive=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity > 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
           @neutral=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity = 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
           @negative=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity < 0 and date BETWEEN ? AND ? ", s.id, val, checkdate,  checkdate2])
           
           count<<[hour,@negative.count, @neutral.count, @positive.count]
+          prevHour=checkdate3
           end
         else
           @a.group_by(&:hour).sort.each do |hour, posts|
@@ -128,9 +144,25 @@ class ArticlesController < ApplicationController
           print "#{hour} : #{posts.count}"
           next_hour=1.hours.since Time.parse(hour)
           
+          checkdate0= Time.parse(hour).utc
           checkdate= Time.parse(hour).utc.to_s  #needed to add utc because search is in utc!? for some reason.. even though config is local time..
           checkdate2=next_hour.utc.to_s       #needed to add utc because search is in utc!? for some reason.. even though config is local time..
+          checkdate3=next_hour.utc
           
+          # Filling in zeros
+          if prevHour.kind_of?(Time)
+               diff=checkdate0-prevHour
+               diff2= diff/3600  #to get hours
+               fromDate=prevHour
+               nextHour=fromDate
+                 while diff2> 0 
+                   count<<[nextHour.strftime('%d %B, %Y %H:00'), 0,0,0]
+                   nextHour= 1.hour.since fromDate
+                   diff2-=1 
+                   fromDate=nextHour
+                 end
+            end
+            
           puts "checkdate isss #{checkdate}"
           puts "checkdate2 isss #{checkdate2}"
           
@@ -139,6 +171,7 @@ class ArticlesController < ApplicationController
           @negative=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity < 0 and date BETWEEN ? AND ? ", s.id, val, checkdate,  checkdate2])
           
           count<<[hour, @negative.count, @neutral.count,@positive.count]
+          prevHour=checkdate3
           end
         end
     
@@ -173,34 +206,74 @@ class ArticlesController < ApplicationController
         #@a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> "Morsi").count(group: :date)
         @a= Article.where(:source_id=>s.id, :target_id=> params[:val])#.count(group: :date)
         gg=0
-        
+        prevHour=""
         if params[:stat]=="per hour"
           @a.group_by(&:hour).sort.each do |hour, posts|
             #puts "hour isss #{Time.parse(hour)}" 
+            # FILLING IN ZEROS WHERE THERE ARE NO MENTIONS
+            if prevHour.kind_of?(Time)
+               diff=Time.parse(hour)-prevHour
+               diff2= diff/3600  #to get hours
+               fromDate=prevHour
+                 while diff2> 1 
+                   nextHour= 1.hour.since fromDate
+                   nextHour2= nextHour.strftime('%H:00')
+                   count<<[nextHour2,0, "#{nextHour.strftime('%d %B, %Y %H:00')}\n Mentions: 0"]
+                   diff2-=1 
+                   fromDate=nextHour
+                 end
+            end
             print "Here"
             gg=gg+posts.count
             print "#{hour} : #{posts.count}"
             only=Time.parse(hour)
             only=only.strftime('%H:00')
             count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]
+            prevHour=Time.parse(hour)
           end
         elsif params[:stat]=="per day"
           @a.group_by(&:day).sort.each do |hour, posts|
+          if prevHour.kind_of?(Time)
+               diff=Time.parse(hour)-prevHour
+               diff2= diff/86400  #to get days
+               fromDate=prevHour
+                 while diff2> 1 
+                   nextHour= 1.day.since fromDate
+                   #nextHour2= nextHour.strftime('%H:00')
+                   count<<[nextHour.strftime('%d %B, %Y'),0, "#{nextHour.strftime('%d %B, %Y')}\n Mentions: 0"]
+                   diff2-=1 
+                   fromDate=nextHour
+                 end
+            end  
           print "Here"
           gg=gg+posts.count
           print "#{hour} : #{posts.count}"
           count<<[hour,posts.count, "#{hour}\n Mentions: #{posts.count}"]
+          prevHour=Time.parse(hour)
           end
         else
           @a.group_by(&:hour).sort.each do |hour, posts|
           #zone = ActiveSupport::TimeZone.new("Cairo")
-          #puts "hour isss #{Time.parse(hour)}"  
+          #puts "hour isss #{Time.parse(hour)}"
+          if prevHour.kind_of?(Time)
+               diff=Time.parse(hour)-prevHour
+               diff2= diff/3600  #to get hours
+               fromDate=prevHour
+                 while diff2> 1 
+                   nextHour= 1.hour.since fromDate
+                   nextHour2= nextHour.strftime('%H:00')
+                   count<<[nextHour2,0, "#{nextHour.strftime('%d %B, %Y %H:00')}\n Mentions: 0"]
+                   diff2-=1 
+                   fromDate=nextHour
+                 end
+            end  
           print "Here"
           gg=gg+posts.count
           print "#{hour} : #{posts.count}"
           only=Time.parse(hour)
           only=only.strftime('%H:00')
           count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]
+          prevHour=Time.parse(hour)
           end
         end
         

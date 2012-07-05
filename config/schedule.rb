@@ -9,7 +9,7 @@
 #
 every 1.hours do
 # #   command "/usr/bin/some_great_command"
-    runner "Article.getAll(3)"
+    runner "Article.getAll(1)"
     
 # #   rake "some:great:rake:task"
 end
