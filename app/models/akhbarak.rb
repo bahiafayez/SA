@@ -12,36 +12,96 @@ class Akhbarak < ActiveRecord::Base
 	#attr_reader :url_search
   def initialize()
     @url_search='http://www.akhbarak.net/api_v2/advanced_search/body'# /page/2/per_page/100.xml'
+    @url_search2='http://www.akhbarak.net/api_v2/articles/search/'#%D8%A7%D8%B3%D8%AF/page/2/per_page/1000.json'
     @map_tweets={}
     @kid=""
     @stopped=0
     @hashtag=""
+    @page=1
+    @list=[]
+    @listids=[]
+    @lock = Mutex.new 
   end
 
   def getArticles(kid, hash_tag) #, num_pages #this id to say start from which (since_id...)
     @kid=kid
     @hashtag=hash_tag
+    @maxid=Article.where(:source_id => 2, :target_id => @kid).first.id_str  # the last id from last time.
+    
    
-      url= "#{@url_search}/#{hash_tag}/from/2/per_page/10"
+      url= "#{@url_search2}#{hash_tag}/page/#{@page}/per_page/100.json"
    
    
     #pp Article.first
   	#max_id=''
   	i=1
-  	#while url != '' and i<20 do 
+  	while getArticles2(url) do
   		print i, ' - ', url
-  		getArticles2(url)
-  		#print "-----------------------------next_page issss #{next_page}"
+  		
+  		@page = @page + 1
+  		print "-----------------------------next_page issss #{@page}"
   		#if next_page == ''
   		#	url= ''
   		#else
-  		#	url = "#{@url_search}#{next_page}"
+  		url = "#{@url_search2}/#{hash_tag}/page/#{@page}/per_page/100.json"
+  		
   		#end
   		i=i+1
-  	#end
+  		
+  		if i==10
+  		  break
+  		end	
+  	end
   	#before returning save the tweets
   	
   	#return [max_id, @stopped]
+  	analyzeArticles()
+  end
+  
+  def analyzeArticles()  #Not Threaded
+    uri = URI.parse("http://omp.sameh.webfactional.com/taggingList")
+    #uri = URI.parse("http://names.alwaysdata.net/taggingList")
+    
+    while !@list.nil? and !@list.empty? do
+    tries=0
+    to_tag_json = ActiveSupport::JSON.encode(@list[0,100])
+    post_body = to_tag_json
+    begin
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.read_timeout=3600
+      http.open_timeout=3600
+      request = Net::HTTP::Post.new(uri.request_uri)
+      request.body = post_body
+      response= http.request(request)
+      resp=response.body
+      resp = ActiveSupport::JSON.decode(resp)
+    rescue Exception => e  
+        tries += 1
+        puts "Error: #{e.message}"
+        puts "Trying again analyze!" if tries <= 3
+        retry if tries <= 3
+        puts "No more attempts in analyzing!"  
+    end
+    
+    if !resp.nil? and !resp.empty? and resp.kind_of?(Array) and resp.length==@listids[0,100].length
+      
+      @listids[0,100].zip(resp).each do |l, a|
+        @article=Article.find(l)
+        @article.polarity=a[1]
+        @article.coloured_text=a[0]
+        @article.save
+      end
+    end
+    #puts "resp wwasssss : #{resp}"
+    #if !resp.nil? and resp.kind_of?(Array)
+    #  puts "size of resppp is #{resp.length}"
+    #end
+    @list=@list[100..@list.length]
+    @listids=@listids[100..@listids.length]
+    if !@listids.nil?
+      puts "id is #{@listids[0]}"
+    end
+    end
   end
   
   def getArticles2(url)
@@ -53,9 +113,10 @@ class Akhbarak < ActiveRecord::Base
 	i=1
 	
 	
-	results=resp[1]
+	results=resp
 	results.each do |r|
 	  print '-------------------------'
+	  puts "r is #{r}"
 	  puts ''
 	  pp r['article']['description']
 	  pp r['article']['published_at']
@@ -63,7 +124,23 @@ class Akhbarak < ActiveRecord::Base
 	  pp r['article']['url']
 	  pp r['article']['title']
 	  #end
-	  mapTweets( r['article']['description'], r['article']['published_at'], r['article']['id'], r['article']['url'], r['article']['title'])
+	  
+	  #get maximum id
+	  
+	  if "#{r['article']['id']}"== @maxid
+	    finished=true
+	    return false   #reached what I got before
+	  end
+	  
+	  if !r['article']['description'].nil?
+	   mapTweets( r['article']['description'], r['article']['published_at'], r['article']['id'], r['article']['url'], r['article']['title'])
+	  end
+	end
+	
+	if results.nil? or results.empty?
+	  return false
+	else
+	  return true
 	end
 	
 
@@ -87,6 +164,9 @@ class Akhbarak < ActiveRecord::Base
 		print "sentences areeeeeeeeeeee \n #{sentences}"
 		@words=Target.find(@kid).query.gsub /"/, ''
 		@words=@words.split("OR")
+		@words.each(&:lstrip!)
+		@words.each(&:rstrip!)
+
 		print @words
 		sentences.each do |sentence|
        if @words.any? { |x| sentence.force_encoding('UTF-8').include?(x.force_encoding('UTF-8')) } #if any of the search terms are in the sentence
@@ -100,6 +180,8 @@ class Akhbarak < ActiveRecord::Base
             #resp = ActiveSupport::JSON.decode(resp)
       		  #a= Article.create(:id_str => id, :body => description, :source_id=> s.id, :date=> date, :target_id => @kid, :polarity => resp[2], :coloured_text => resp[0])
       		  a= Article.create(:id_str => id, :body => sentence, :source_id=> s.id, :date=> date, :target_id => @kid, :url => url, :title => title)
+      		  @list<< sentence
+            @listids<<a.id
       		rescue Exception => e  
             tries += 1
             puts "Error: #{e.message}"
