@@ -123,11 +123,11 @@ class Akhbarak < ActiveRecord::Base
 	  print '-------------------------'
 	  puts "r is #{r}"
 	  puts ''
-	  pp r['article']['description']
-	  pp r['article']['published_at']
-	  pp r['article']['id']
-	  pp r['article']['url']
-	  pp r['article']['title']
+	  #pp r['article']['description']
+	  #pp r['article']['published_at']
+	  #pp r['article']['id']
+	  #pp r['article']['url']
+	  #pp r['article']['title']
 	  #end
 	  
 	  #get maximum id
