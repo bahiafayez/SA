@@ -116,6 +116,9 @@ class ArticlesController < ApplicationController
           checkdate0= Time.parse(hour).utc
           checkdate3=next_day.utc
           
+          print "checkdate 0 is #{checkdate0}"
+          puts "checkdate3 is #{checkdate3}"
+          
           # Filling in zeros
           if prevHour.kind_of?(Time)
                diff=checkdate0-prevHour
@@ -123,8 +126,12 @@ class ArticlesController < ApplicationController
                fromDate=prevHour
                nextHour=fromDate
                  while diff2> 0 
-                   count<<[nextHour.strftime('%d %B, %Y'), 0,0,0]
+                   
+                   puts "nexthour is #{nextHour}"
+                   puts "after strftime #{nextHour.strftime('%d %B, %Y')}"
                    nextHour= 1.day.since fromDate
+                   count<<[nextHour.strftime('%d %B, %Y'), 0,0,0]
+                   
                    diff2-=1 
                    fromDate=nextHour
                  end
