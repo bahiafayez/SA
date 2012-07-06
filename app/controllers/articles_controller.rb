@@ -103,6 +103,7 @@ class ArticlesController < ApplicationController
         #@negative=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity < 0", s.id, keyword])
         gg=0
         prevHour=""
+        prevHour2=""
         if params[:stat]=="per day"
           @a.group_by(&:day).sort{|x,y| Time.parse(x[0]) <=> Time.parse(y[0])}.each do |hour, posts|
           print "Here"
@@ -123,7 +124,8 @@ class ArticlesController < ApplicationController
           if prevHour.kind_of?(Time)
                diff=checkdate0-prevHour
                diff2= diff/86400  #to get days
-               fromDate=prevHour
+               #fromDate=prevHour
+               fromDate=Time.parse(prevHour2).in_time_zone('Cairo')
                nextHour=fromDate
                  while diff2> 0 
                    
@@ -143,6 +145,7 @@ class ArticlesController < ApplicationController
           
           count<<[hour,@negative.count, @neutral.count, @positive.count]
           prevHour=checkdate3
+          prevHour2= hour
           end
         else
           
@@ -171,11 +174,14 @@ class ArticlesController < ApplicationController
           if prevHour.kind_of?(Time)
                diff=checkdate0-prevHour
                diff2= diff/3600  #to get hours
-               fromDate=prevHour
-               nextHour=fromDate
-                 while diff2> 0 
+               fromDate=Time.parse(prevHour2).in_time_zone('Cairo')
+               #nextHour2=Time.parse(hour)
+               puts "diff2 isssssss #{diff2}"
+                 while diff2> 0
+                   
+                   nextHour= 1.hours.since fromDate
+                   puts "nextHour isss #{nextHour}"
                    count<<[nextHour.strftime('%d %B, %Y %H:00'), 0,0,0]
-                   nextHour= 1.hour.since fromDate
                    diff2-=1 
                    fromDate=nextHour
                  end
@@ -190,6 +196,7 @@ class ArticlesController < ApplicationController
           
           count<<[hour, @negative.count, @neutral.count,@positive.count]
           prevHour=checkdate3
+          prevHour2=hour
           end
         end
     
