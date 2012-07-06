@@ -110,11 +110,11 @@ class ArticlesController < ApplicationController
           print "#{hour} : #{posts.count}"
           next_day=1.days.since Time.parse(hour)
           
-          checkdate= Time.parse(hour).to_formatted_s(:db)
-          checkdate2=next_day.to_formatted_s(:db)
+          checkdate= Time.parse(hour).utc.to_formatted_s(:db)
+          checkdate2=next_day.utc.to_formatted_s(:db)
           
-          checkdate0= Time.parse(hour)
-          checkdate3=next_day
+          checkdate0= Time.parse(hour).utc
+          checkdate3=next_day.utc
           
           # Filling in zeros
           if prevHour.kind_of?(Time)
@@ -138,7 +138,11 @@ class ArticlesController < ApplicationController
           prevHour=checkdate3
           end
         else
-          lastDate=@a.first.date
+          
+          if !@a.empty?
+            lastDate=@a.first.date
+          end
+          
           @a.group_by(&:hour).sort{|x,y| Time.parse(x[0]) <=> Time.parse(y[0])}.each do |hour, posts|
           print "Here"
           gg=gg+posts.count
@@ -151,7 +155,8 @@ class ArticlesController < ApplicationController
           checkdate3=next_hour.utc
           
           puts "date difference issssss#{lastDate - checkdate0}"
-          if lastDate - checkdate0  > 86400
+          
+          if !lastDate.nil? and (lastDate - checkdate0  > 86400)
             next
           end
           
@@ -300,17 +305,21 @@ class ArticlesController < ApplicationController
     
     if type=="per day"
       a= 1.days.since Time.parse(date)
+      checkdate= Time.parse(date).utc.to_formatted_s(:db)
+       checkdate2=a.utc.to_formatted_s(:db)
     else
       a= 1.hours.since Time.parse(date)
+      checkdate= Time.parse(date).utc.to_formatted_s(:db)
+      checkdate2=a.utc.to_formatted_s(:db)
     end
      date2= 1.minutes.since date.to_datetime
     date3=date.to_datetime
     print date2
     print date3
-    checkdate= Time.parse(date).utc.to_formatted_s(:db)
+    
     print "over hereeeeee"
     #a= 1.minutes.since Time.parse(date)
-    checkdate2=a.utc.to_formatted_s(:db)
+    
     # checkdate2= Time.zone.parse(date2).utc.to_formatted_s(:db)
     # print "checkdate issss"
      print checkdate
