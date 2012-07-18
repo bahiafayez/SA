@@ -23,6 +23,8 @@
     allCharts[1]= new myChart("twitter", "sentiments");
     allCharts[2]= new myChart("articles", "mentions")
     allCharts[3]= new myChart("articles", "sentiments");
+    allCharts[4]= new myChart("comments", "mentions");
+    allCharts[5]= new myChart("comments", "sentiments");
     
     // Load the Visualization API and the piechart package.
     google.load('visualization', '1.0', {'packages':['corechart']});      
@@ -172,6 +174,10 @@ getKey = function(val, obj) {
 			<div id="articles_sentiments" ></div>
 			<center><%= submit_tag "Detailed View", :name => "articles_sentiments" %></center>
 </div>
+<div class="span4">
+			<div id="comments_sentiments" ></div>
+			<center><%= submit_tag "Detailed View", :name => "comments_sentiments" %></center>
+</div>
 </div>
 <div class="span12">
 <div class="span4">
@@ -182,6 +188,11 @@ getKey = function(val, obj) {
 <div class="span4">
 			<div id="articles_mentions" ></div>
 			<center><%= submit_tag "Detailed View" , :name => "articles_mentions" %></center>
+			
+</div>
+<div class="span4">
+			<div id="comments_mentions" ></div>
+			<center><%= submit_tag "Detailed View" , :name => "comments_mentions" %></center>
 			
 </div>
 </div>

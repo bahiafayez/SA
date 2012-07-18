@@ -9,6 +9,7 @@ gem "meta_search",    '>= 1.1.0.pre'
 gem "twitter"
 gem 'whenever', :require => false
 gem 'sass-rails'
+gem 'nokogiri'
 #gem 'libv8', '3.3.10.4'
 # Gems used only for assets and not required
 # in production environments by default.

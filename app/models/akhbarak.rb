@@ -174,7 +174,8 @@ class Akhbarak < ActiveRecord::Base
 
 		print @words
 		sentences.each do |sentence|
-       if @words.any? { |x| sentence.force_encoding('UTF-8').include?(x.force_encoding('UTF-8')) } #if any of the search terms are in the sentence
+		  # checking if any of the words are in the sentence. and only the word (using \b)
+       if @words.any? { |x| sentence =~ /\b#{x}\b/ } #sentence.force_encoding('UTF-8').include?(x.force_encoding('UTF-8')) } #if any of the search terms are in the sentence
          puts "yes it includedssss"
         tries=0
     		
