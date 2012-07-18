@@ -175,7 +175,13 @@ class ArticlesController < ApplicationController
         else
           
           if !@a.empty?
-            lastDate=@a.first.date
+            #if flag
+              #@c=Comment.order("article_id DESC").first
+              #lastDate=1.days.ago  #if a comment  #OK or change?
+            #else
+            if flag==false
+              lastDate=@a.first.date  
+            end
           end
           
           @a.group_by(&:hour).sort{|x,y| Time.parse(x[0]) <=> Time.parse(y[0])}.each do |hour, posts|
@@ -189,9 +195,9 @@ class ArticlesController < ApplicationController
           checkdate2=next_hour.utc.to_s       #needed to add utc because search is in utc!? for some reason.. even though config is local time..
           checkdate3=next_hour.utc
           
-          puts "date difference issssss#{lastDate - checkdate0}"
+          #puts "date difference issssss#{lastDate - checkdate0}"
           
-          if !lastDate.nil? and (lastDate - checkdate0  > 86400)
+          if flag==false and !lastDate.nil? and (lastDate - checkdate0  > 86400)
             next
           end
           
