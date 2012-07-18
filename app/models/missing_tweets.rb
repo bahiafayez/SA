@@ -148,7 +148,8 @@ class MissingTweets < ActiveRecord::Base
   def getMissingTweets()
     
     
-		s=Source.find_by_name("Twitter")
+		#s=Source.find_by_name("Twitter")
+		s=Source.find_by_name("Articles")
 		
 		Article.where(:source_id => s.id, :polarity=> nil).each do |d|
 		  

@@ -91,8 +91,14 @@ class ArticlesController < ApplicationController
     val=params[:val]
     source=params[:src]
     #all={'value'=> val, 'source'=> source}
+    flag=false
+    if source=="comments"
+      s=Source.find(:first, :conditions => [ "lower(name) = 'articles'" ])
+      flag=true
+    else
+      s=Source.find(:first, :conditions => [ "lower(name) = ?", source.downcase ])  
+    end
     
-    s=Source.find(:first, :conditions => [ "lower(name) = ?", source.downcase ])
         #Article.where(:source_id => s.id)
         #Article.joins(:keywords).where('keywords.name'=> "Morsi").count
         count=[]
@@ -139,13 +145,32 @@ class ArticlesController < ApplicationController
                  end
             end
           
+          if flag==false
+            
+          
           @positive=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity > 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
           @neutral=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity = 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
           @negative=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity < 0 and date BETWEEN ? AND ? ", s.id, val, checkdate,  checkdate2])
           
+          
+          else #comments
+            @as=Article.find(:all, :conditions =>["source_id = ? and target_id=? and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
+            @positive=[]
+            @neutral=[]
+            @negative=[]
+            @as.each do |ab|
+              @positive += Comment.find(:all, :conditions => ["article_id = ? and polarity>0" , ab.id  ])
+              @neutral += Comment.find(:all, :conditions => ["article_id = ? and polarity=0" , ab.id  ])
+              @negative += Comment.find(:all, :conditions => ["article_id = ? and polarity<0" , ab.id  ])
+            end
+          
+          end
+          
           count<<[hour,@negative.count, @neutral.count, @positive.count]
           prevHour=checkdate3
           prevHour2= hour
+          
+          
           end
         else
           
@@ -190,9 +215,25 @@ class ArticlesController < ApplicationController
           puts "checkdate isss #{checkdate}"
           puts "checkdate2 isss #{checkdate2}"
           
+          if flag==false
+          
           @positive=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity > 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
           @neutral=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity = 0 and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
           @negative=Article.find(:all, :conditions =>["source_id = ? and target_id=? and polarity < 0 and date BETWEEN ? AND ? ", s.id, val, checkdate,  checkdate2])
+          
+          
+          else #comments
+            @as=Article.find(:all, :conditions =>["source_id = ? and target_id=? and date BETWEEN ? AND ? ", s.id, val, checkdate, checkdate2])
+            @positive=[]
+            @neutral=[]
+            @negative=[]
+            @as.each do |ab|
+              @positive += Comment.find(:all, :conditions => ["article_id = ? and polarity>0" , ab.id  ])
+              @neutral += Comment.find(:all, :conditions => ["article_id = ? and polarity=0" , ab.id  ])
+              @negative += Comment.find(:all, :conditions => ["article_id = ? and polarity<0" , ab.id  ])
+            end
+          
+          end
           
           count<<[hour, @negative.count, @neutral.count,@positive.count]
           prevHour=checkdate3
@@ -210,14 +251,15 @@ class ArticlesController < ApplicationController
   end
   
   def get_mentions
+    flag=false
     source=params[:src]
     y = Date.new(2012, 3, 15)
     z = Date.new(2012, 3, 16)
     if source=="articles"
       s=Source.find_by_name("Articles")
     elsif source=="comments"
-      s=Source.find_by_name("Comments")
-
+      s=Source.find_by_name("Articles")
+      flag=true
     else
       # count= [
           # [y, 55,22,54,111,89],
@@ -225,6 +267,9 @@ class ArticlesController < ApplicationController
         # ]
         s=Source.find_by_name("Twitter")
     end
+    
+    
+    
         #Article.where(:source_id => s.id)
         #Article.joins(:keywords).where('keywords.name'=> "Morsi").count
         count=[]
@@ -251,9 +296,24 @@ class ArticlesController < ApplicationController
             print "Here"
             gg=gg+posts.count
             print "#{hour} : #{posts.count}"
+            
+            
+            
             only=Time.parse(hour)
             only=only.strftime('%H:00')
-            count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]
+            
+            if flag==true #comments
+              puts "IN COMMENTS!!!!!!!!!!!!!!!!!!!!!!!"
+              puts posts[0]
+              comments=[]
+              posts.each do |p|
+                comments+= Comment.where(:article_id => p.id)
+              end
+              count<<[only,comments.count, "#{hour}\n Mentions: #{comments.count}"]
+            else
+              count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]  
+            end
+            
             prevHour=Time.parse(hour)
           end
         elsif params[:stat]=="per day"
@@ -273,7 +333,20 @@ class ArticlesController < ApplicationController
           print "Here"
           gg=gg+posts.count
           print "#{hour} : #{posts.count}"
-          count<<[hour,posts.count, "#{hour}\n Mentions: #{posts.count}"]
+          
+          if flag==true #comments
+              puts "IN COMMENTS!!!!!!!!!!!!!!!!!!!!!!!"
+              puts posts[0]
+              comments=[]
+              posts.each do |p|
+                comments+= Comment.where(:article_id => p.id)
+              end
+              count<<[hour,comments.count, "#{hour}\n Mentions: #{comments.count}"]
+            else
+              count<<[hour,posts.count, "#{hour}\n Mentions: #{posts.count}"]  
+            end
+          
+          #count<<[hour,posts.count, "#{hour}\n Mentions: #{posts.count}"]
           prevHour=Time.parse(hour)
           end
         else
@@ -297,7 +370,20 @@ class ArticlesController < ApplicationController
           print "#{hour} : #{posts.count}"
           only=Time.parse(hour)
           only=only.strftime('%H:00')
-          count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]
+          
+          if flag==true #comments
+              puts "IN COMMENTS!!!!!!!!!!!!!!!!!!!!!!!"
+              puts posts[0]
+              comments=[]
+              posts.each do |p|
+                comments+= Comment.where(:article_id => p.id)
+              end
+              count<<[only,comments.count, "#{hour}\n Mentions: #{comments.count}"]
+            else
+              count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]  
+            end
+            
+          #count<<[only,posts.count, "#{hour}\n Mentions: #{posts.count}"]
           prevHour=Time.parse(hour)
           end
         end
@@ -338,33 +424,80 @@ class ArticlesController < ApplicationController
     # print "checkdate issss"
      print checkdate
     # print checkdate
+    flag=false
+    if stat=="comments"
+      s=Source.find(:first, :conditions => [ "lower(name) = 'articles'"])
+      flag=true
+    else
+      s=Source.find(:first, :conditions => [ "lower(name) = ?", stat.downcase ])
+    end
     
-    s=Source.find(:first, :conditions => [ "lower(name) = ?", stat.downcase ])
     
         text=[]
-        #@a=Article.where(:date > date , :source_id=> s.id, :target_id=> 1)
-        #@a =Article.find(:all, :conditions =>["date(date) BETWEEN ? AND ? ", date2, date3])
-        if params[:sent]=="Positive"
-          @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? and polarity>0", checkdate, checkdate2, s.id, keyword])
-        elsif params[:sent]=="Neutral"
-          @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? and polarity=0", checkdate, checkdate2, s.id, keyword])
-        elsif params[:sent]=="Negative"
-          @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? and polarity<0", checkdate, checkdate2, s.id, keyword])
-        else
-          @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? ", checkdate, checkdate2, s.id, keyword])
-        end
-        
-
-        #@a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> keyword, 'articles.date'=>checkdate)
-        if params[:sent]
-          @a.each do |l|
-            text<< l.coloured_text
+        if flag==false
+          #@a=Article.where(:date > date , :source_id=> s.id, :target_id=> 1)
+          #@a =Article.find(:all, :conditions =>["date(date) BETWEEN ? AND ? ", date2, date3])
+          if params[:sent]=="Positive"
+            @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? and polarity>0", checkdate, checkdate2, s.id, keyword])
+          elsif params[:sent]=="Neutral"
+            @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? and polarity=0", checkdate, checkdate2, s.id, keyword])
+          elsif params[:sent]=="Negative"
+            @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? and polarity<0", checkdate, checkdate2, s.id, keyword])
+          else
+            @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? ", checkdate, checkdate2, s.id, keyword])
           end
-        else
-          @a.each do |l|
-            text<< l.body
+          
+  
+          #@a=Article.joins(:keywords).where('articles.source_id'=>s.id, 'keywords.name'=> keyword, 'articles.date'=>checkdate)
+          if params[:sent]
+            @a.each do |l|
+              text<< l.coloured_text
+            end
+          else
+            @a.each do |l|
+              text<< l.body
+            end
           end
-        end
+       else
+         
+           @a=Article.find(:all, :conditions =>["date BETWEEN ? AND ? and source_id = ? and target_id=? ", checkdate, checkdate2, s.id, keyword])
+            @text2=[]
+            
+           
+         
+         if params[:sent]=="Positive"
+            @a.each do |ab|
+              @text2 += Comment.find(:all, :conditions => ["article_id = ? and polarity>0" , ab.id  ])
+            end
+          elsif params[:sent]=="Neutral"
+            @a.each do |ab|
+              @text2 += Comment.find(:all, :conditions => ["article_id = ? and polarity=0" , ab.id  ])
+            end
+          elsif params[:sent]=="Negative"
+            @a.each do |ab|
+              @text2 += Comment.find(:all, :conditions => ["article_id = ? and polarity<0" , ab.id  ])
+            end
+          else
+             comments=[]
+             @a.each do |p|
+                comments+= Comment.where(:article_id => p.id)
+              end
+          end
+          
+          if params[:sent]
+             @text2.each do |l|
+               text<< "#{l.coloured_comment} - <a href='#{l.article.url}'>#{l.article.url}</a>"
+             end
+          else
+            comments.each do |l|
+              text<< "#{l.comment} - <a href='#{l.article.url}'>#{l.article.url}</a>"
+              
+            end
+          end
+          
+          
+       end
+            
     
     render json: text
  end
