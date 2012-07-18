@@ -7,12 +7,12 @@
 #
 # set :output, "/path/to/my/cron_log.log"
 #
-every 1.hours do
+#every 1.hours do
 # #   command "/usr/bin/some_great_command"
-    runner "Article.getAll(1)"
+#    runner "Article.getAll(1)"
     
 # #   rake "some:great:rake:task"
-end
+#end
 #
 # every 4.days do
 #   runner "AnotherModel.prune_old_records"
